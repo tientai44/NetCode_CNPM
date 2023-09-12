@@ -12,7 +12,7 @@ namespace SkeletonEditor
         Idle,
         Walk,
         Run,
-        Attack1h1,
+        Attack,
         ReverseWalk,
     }
     public class PlayerController : NetworkBehaviour
@@ -47,12 +47,14 @@ namespace SkeletonEditor
         private Vector3 oldInputRotation = Vector3.zero;
         private PlayerState oldPlayerState = PlayerState.Idle;
         private float speed;
+        [SerializeField]
         private Animator animator;
 
+        private bool isAttacking =false;
         private void Awake()
         {
             characterController = GetComponent<CharacterController>();
-            animator = GetComponent<Animator>();
+
         }
 
         void Start()
@@ -92,14 +94,9 @@ namespace SkeletonEditor
             if (oldPlayerState != networkPlayerState.Value)
             {
                 oldPlayerState = networkPlayerState.Value;
-                if (networkPlayerState.Value == PlayerState.Idle || networkPlayerState.Value == PlayerState.Walk || networkPlayerState.Value == PlayerState.Run || networkPlayerState.Value == PlayerState.ReverseWalk)
-                {
-                    animator.SetFloat("speedv", networkSpeed.Value);
-                }
-                else
-                {
-                    animator.SetTrigger(networkPlayerState.Value.ToString());
-                }
+
+                animator.Play(networkPlayerState.Value.ToString());
+
             }
         }
 
@@ -107,7 +104,7 @@ namespace SkeletonEditor
         {
             float h = Input.GetAxis("Horizontal");
             float v = Input.GetAxis("Vertical");
-            speed = Mathf.Abs(v)*walkSpeed;
+            speed = Mathf.Abs(v) * walkSpeed;
             UpdateCurrentSpeedServerRpc(speed);
             // left & right rotation
             Vector3 inputRotation = new Vector3(0, h, 0);
@@ -120,10 +117,12 @@ namespace SkeletonEditor
             // change animation states
             if (ActivePunchActionKey() && forwardInput == 0)
             {
-                UpdatePlayerStateServerRpc(PlayerState.Attack1h1);
+                UpdatePlayerStateServerRpc(PlayerState.Attack);
+                isAttacking=true;
+                Invoke(nameof(ResetAttack), 2);
                 return;
             }
-            if (forwardInput == 0)
+            if (forwardInput == 0 && !isAttacking )
                 UpdatePlayerStateServerRpc(PlayerState.Idle);
             else if (!ActiveRunningActionKey() && forwardInput > 0 && forwardInput <= 1)
                 UpdatePlayerStateServerRpc(PlayerState.Walk);
@@ -151,7 +150,10 @@ namespace SkeletonEditor
         {
             return Input.GetKey(KeyCode.LeftShift) || Input.GetKey(KeyCode.RightShift);
         }
-
+        public void ResetAttack()
+        {
+            isAttacking = false;    
+        }
         [ServerRpc]
         public void UpdateClientPositionAndRotationServerRpc(Vector3 newPosition, Vector3 newRotation)
         {
