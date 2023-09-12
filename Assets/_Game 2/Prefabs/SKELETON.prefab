@@ -1854,8 +1854,10 @@ GameObject:
   m_Component:
   - component: {fileID: 8174940822121711698}
   - component: {fileID: 8084039395426947638}
+  - component: {fileID: 4621400728066699811}
   - component: {fileID: 8139816040328655650}
   - component: {fileID: 8438173420812308303}
+  - component: {fileID: 8163414269611062016}
   m_Layer: 0
   m_Name: SKELETON
   m_TagString: Untagged
@@ -1902,6 +1904,20 @@ Animator:
   m_AllowConstantClipSamplingOptimization: 1
   m_KeepAnimatorStateOnDisable: 0
   m_WriteDefaultValuesOnDisable: 0
+--- !u!114 &4621400728066699811
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 8171635864156240366}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 8ac853c8124f39945bda2ab0793b2c94, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  playersName:
+    m_InternalValue: 
 --- !u!114 &8139816040328655650
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -1914,7 +1930,18 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: f77b8e612814cce488f6a6c228346be2, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  mouseRotateSpeed: 0.3
+  walkSpeed: 3.5
+  runSpeedOffset: 2
+  rotationSpeed: 3.5
+  defaultInitialPositionOnPlane: {x: -4, y: 4}
+  networkPositionDirection:
+    m_InternalValue: {x: 0, y: 0, z: 0}
+  networkRotationDirection:
+    m_InternalValue: {x: 0, y: 0, z: 0}
+  networkPlayerState:
+    m_InternalValue: 0
+  networkSpeed:
+    m_InternalValue: 0
 --- !u!114 &8438173420812308303
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -1931,6 +1958,24 @@ MonoBehaviour:
   AlwaysReplicateAsRoot: 0
   DontDestroyWithOwner: 0
   AutoObjectParentSync: 1
+--- !u!143 &8163414269611062016
+CharacterController:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 8171635864156240366}
+  m_Material: {fileID: 0}
+  m_IsTrigger: 0
+  m_Enabled: 1
+  serializedVersion: 2
+  m_Height: 2
+  m_Radius: 0.5
+  m_SlopeLimit: 45
+  m_StepOffset: 0.3
+  m_SkinWidth: 0.08
+  m_MinMoveDistance: 0.001
+  m_Center: {x: 0, y: 1.2, z: 0}
 --- !u!1 &8171681259565912870
 GameObject:
   m_ObjectHideFlags: 0
