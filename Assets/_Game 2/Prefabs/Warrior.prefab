@@ -1858,7 +1858,7 @@ GameObject:
   - component: {fileID: 8438173420812308303}
   - component: {fileID: 8163414269611062016}
   m_Layer: 0
-  m_Name: SKELETON
+  m_Name: Warrior
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0

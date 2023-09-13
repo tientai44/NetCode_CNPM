@@ -21,7 +21,7 @@ namespace SkeletonEditor
         private float walkSpeed = 3.5f;
 
         [SerializeField]
-        private float runSpeedOffset = 2.0f;
+        private float runSpeedOffset = 3.5f;
 
         [SerializeField]
         private float rotationSpeed = 3.5f;
@@ -91,7 +91,7 @@ namespace SkeletonEditor
 
         private void ClientVisuals()
         {
-            if (oldPlayerState != networkPlayerState.Value)
+            //if (oldPlayerState != networkPlayerState.Value)
             {
                 oldPlayerState = networkPlayerState.Value;
 
@@ -113,13 +113,13 @@ namespace SkeletonEditor
             Vector3 direction = transform.TransformDirection(Vector3.forward);
             float forwardInput = v;
             Vector3 inputPosition = direction * forwardInput;
-
+        
             // change animation states
-            if (ActivePunchActionKey() && forwardInput == 0)
+            if (ActivePunchActionKey() && forwardInput == 0 && !isAttacking)
             {
                 UpdatePlayerStateServerRpc(PlayerState.Attack);
                 isAttacking=true;
-                Invoke(nameof(ResetAttack), 2);
+                Invoke(nameof(ResetAttack), 2f);
                 return;
             }
             if (forwardInput == 0 && !isAttacking )
