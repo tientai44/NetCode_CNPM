@@ -91,7 +91,7 @@ namespace SkeletonEditor
 
         private void ClientVisuals()
         {
-            //if (oldPlayerState != networkPlayerState.Value)
+            if (oldPlayerState != networkPlayerState.Value)
             {
                 oldPlayerState = networkPlayerState.Value;
 
@@ -115,7 +115,7 @@ namespace SkeletonEditor
             Vector3 inputPosition = direction * forwardInput;
         
             // change animation states
-            if (ActivePunchActionKey() && forwardInput == 0 && !isAttacking)
+            if (ActivePunchActionKey() && forwardInput == 0 && !isAttacking && oldPlayerState !=PlayerState.Attack)
             {
                 UpdatePlayerStateServerRpc(PlayerState.Attack);
                 isAttacking=true;
@@ -139,6 +139,7 @@ namespace SkeletonEditor
                 oldInputRotation != inputRotation)
             {
                 oldInputPosition = inputPosition;
+                oldInputRotation = inputRotation;
                 UpdateClientPositionAndRotationServerRpc(inputPosition * walkSpeed, inputRotation * rotationSpeed);
             }
         }
