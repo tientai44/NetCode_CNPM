@@ -1857,9 +1857,11 @@ GameObject:
   - component: {fileID: 8139816040328655650}
   - component: {fileID: 8438173420812308303}
   - component: {fileID: 8163414269611062016}
-  m_Layer: 0
-  m_Name: SKELETON
-  m_TagString: Untagged
+  - component: {fileID: 4323793664950089222}
+  - component: {fileID: 852128033559320127}
+  m_Layer: 3
+  m_Name: Warrior
+  m_TagString: Player
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -1954,6 +1956,46 @@ CharacterController:
   m_SkinWidth: 0.08
   m_MinMoveDistance: 0.001
   m_Center: {x: 0, y: 1.2, z: 0}
+--- !u!114 &4323793664950089222
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 8171635864156240366}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: e96cb6065543e43c4a752faaa1468eb1, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  SyncPositionX: 1
+  SyncPositionY: 1
+  SyncPositionZ: 1
+  SyncRotAngleX: 1
+  SyncRotAngleY: 1
+  SyncRotAngleZ: 1
+  SyncScaleX: 1
+  SyncScaleY: 1
+  SyncScaleZ: 1
+  PositionThreshold: 0.001
+  RotAngleThreshold: 0.01
+  ScaleThreshold: 0.01
+  InLocalSpace: 0
+  Interpolate: 1
+--- !u!136 &852128033559320127
+CapsuleCollider:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 8171635864156240366}
+  m_Material: {fileID: 0}
+  m_IsTrigger: 1
+  m_Enabled: 1
+  m_Radius: 1.02
+  m_Height: 7.38
+  m_Direction: 1
+  m_Center: {x: 0, y: 4.12, z: 0}
 --- !u!1 &8171681259565912870
 GameObject:
   m_ObjectHideFlags: 0
@@ -2208,6 +2250,25 @@ Transform:
   m_CorrespondingSourceObject: {fileID: 8296012142041130240, guid: 046e13c6d2752b14d827d6839b12715e, type: 3}
   m_PrefabInstance: {fileID: 8472926112509245033}
   m_PrefabAsset: {fileID: 0}
+--- !u!1 &1008642292673579475 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: 8676901264405053370, guid: 046e13c6d2752b14d827d6839b12715e, type: 3}
+  m_PrefabInstance: {fileID: 8472926112509245033}
+  m_PrefabAsset: {fileID: 0}
+--- !u!114 &2950248935540892384
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1008642292673579475}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: e8d0727d5ae3244e3b569694d3912374, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  TransitionStateInfoList: []
+  m_Animator: {fileID: 4266714341794297945}
 --- !u!95 &4266714341794297945 stripped
 Animator:
   m_CorrespondingSourceObject: {fileID: 5666526129788816944, guid: 046e13c6d2752b14d827d6839b12715e, type: 3}
