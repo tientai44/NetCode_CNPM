@@ -2,6 +2,7 @@
 using System.Globalization;
 using Unity.Netcode;
 using Unity.Netcode.Components;
+using Unity.VisualScripting;
 using UnityEngine;
 using UnityEngine.Playables;
 
@@ -59,6 +60,8 @@ namespace SkeletonEditor
         private float heightUpAttack = 3;
         private float timeDelayCheckHit = 0.5f;
         private bool isCheckHit = true;
+        [SerializeField]private ParticleSystem effectZone;
+        [SerializeField] private ParticleSystem effectAttack;
         private void Awake()
         {
             characterController = GetComponent<CharacterController>();
@@ -71,6 +74,8 @@ namespace SkeletonEditor
             {
                 transform.position = new Vector3(Random.Range(defaultInitialPositionOnPlane.x, defaultInitialPositionOnPlane.y), 0,
                        Random.Range(defaultInitialPositionOnPlane.x, defaultInitialPositionOnPlane.y));
+                G2_CameraFollow.Instance.SetTarget(transform);
+                effectZone.Play();
             }
         }
 
@@ -232,6 +237,9 @@ namespace SkeletonEditor
                 if (playerHit != null)
                 {
                     UpdateHealthServerRpc(500, playerHit.OwnerClientId);
+                    effectAttack.transform.position = hit.transform.position + Vector3.up *heightUpAttack;
+                    effectAttack.Play();
+                    effectAttack.GetComponent<NetworkObject>().Despawn();
                     Debug.Log("Attack a enemy");
                 }
             }
