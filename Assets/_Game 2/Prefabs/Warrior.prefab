@@ -1858,9 +1858,10 @@ GameObject:
   - component: {fileID: 8438173420812308303}
   - component: {fileID: 8163414269611062016}
   - component: {fileID: 4323793664950089222}
-  m_Layer: 0
+  - component: {fileID: 852128033559320127}
+  m_Layer: 3
   m_Name: Warrior
-  m_TagString: Untagged
+  m_TagString: Player
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -1981,6 +1982,20 @@ MonoBehaviour:
   ScaleThreshold: 0.01
   InLocalSpace: 0
   Interpolate: 1
+--- !u!136 &852128033559320127
+CapsuleCollider:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 8171635864156240366}
+  m_Material: {fileID: 0}
+  m_IsTrigger: 1
+  m_Enabled: 1
+  m_Radius: 1.02
+  m_Height: 7.38
+  m_Direction: 1
+  m_Center: {x: 0, y: 4.12, z: 0}
 --- !u!1 &8171681259565912870
 GameObject:
   m_ObjectHideFlags: 0

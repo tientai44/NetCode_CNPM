@@ -10,7 +10,9 @@ public class UIManager : MonoBehaviour
     [SerializeField] Button startHostButton;
     [SerializeField] Button startSeverButton;
     [SerializeField] Button startClientButton;
+    [SerializeField] Button executePhysicsButton;
     [SerializeField] TextMeshProUGUI playersInGameTxt;
+    private bool hasServerStarted;
 
     private void Awake()
     {
@@ -22,6 +24,12 @@ public class UIManager : MonoBehaviour
         startSeverButton.onClick.AddListener(OnClickStartClientBtn);
         startClientButton.onClick.AddListener(OnClickStartClientBtn);
         startHostButton.onClick.AddListener(OnClickStartHostBtn);
+        executePhysicsButton.onClick.AddListener(OnClickExecutePhysics);
+
+        NetworkManager.Singleton.OnServerStarted += () =>
+        {
+            hasServerStarted = true;
+        };
     }
     private void Update()
     {
@@ -59,5 +67,14 @@ public class UIManager : MonoBehaviour
         {
             LoggerDebug.Instance.LogInfo("Client could not be started...");
         }
+    }
+    void OnClickExecutePhysics()
+    {
+        if (!hasServerStarted)
+        {
+            LoggerDebug.Instance.LogWarning("Server has not started...");
+            return;
+        }
+        SpawnerController.Instance.SpawnObjects();
     }
 }
