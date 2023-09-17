@@ -2093,9 +2093,12 @@ MonoBehaviour:
     m_InternalValue: 0
   networkPlayerHealth:
     m_InternalValue: 1000
+  networkMaxPlayerHealth:
+    m_InternalValue: 1000
   oldPlayerHealth: 0
   oldPlayerState: 0
   animator: {fileID: 4266714341794297945}
+  skillEffect: {fileID: 2207421776584407272, guid: c36027d36e8e0a64aae855c3f1c48886, type: 3}
   effectZone: {fileID: 6106560326146765444}
   effectAttack: {fileID: 7126264376482820334, guid: eb50864f22d592d4ca666cf2a6507234, type: 3}
 --- !u!114 &8438173420812308303

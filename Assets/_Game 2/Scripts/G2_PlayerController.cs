@@ -64,9 +64,11 @@ namespace SkeletonEditor
 
         private bool isAttacking = false;
         private float attackRange = 10f;
-        private float heightUpAttack = 3;
+        private float heightUpAttack = 4;
         private float timeDelayCheckHit = 0.5f;
         private bool isCheckHit = true;
+        [SerializeField] private GameObject skillEffect;
+
         [SerializeField] private ParticleSystem effectZone;
         [SerializeField] private ParticleSystem effectAttack;
 
@@ -251,7 +253,7 @@ namespace SkeletonEditor
             isCheckHit = true;
             Debug.Log("hit");
             RaycastHit hit;
-
+            SkillEffectServerRpc(transform.position + Vector3.up * heightUpAttack + transform.forward*2);
             int layerMask = LayerMask.GetMask("Player");
 
             if (Physics.SphereCast(transform.position + Vector3.up * heightUpAttack,1f, transform.forward, out hit, attackRange, layerMask))
@@ -270,6 +272,12 @@ namespace SkeletonEditor
             {
                 Debug.DrawRay(transform.position + Vector3.up * heightUpAttack, transform.forward * attackRange, Color.red);
             }
+        }
+        [ServerRpc]
+        public void SkillEffectServerRpc(Vector3 pos)
+        {
+            NetworkObject networkObject = Instantiate(skillEffect,pos,transform.rotation).GetComponent<NetworkObject>();
+            networkObject.Spawn();
         }
         [ServerRpc]
         public void SpawnAttackServerRpc(Vector3 pos)
