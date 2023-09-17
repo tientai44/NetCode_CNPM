@@ -41,4 +41,15 @@ public class PlayersManager : NetworkBehaviour
         
         };
     }
+    public void DisconnectPlayer(NetworkObject player)
+    {
+        // Note: If a client invokes this method, it will throw an exception.
+        if (IsServer)
+        {
+            NetworkManager.DisconnectClient(player.OwnerClientId);
+            LoggerDebug.Instance.LogInfo($"{player.OwnerClientId} just disconnected...");
+
+            playersInGame.Value--;
+        }
+    }
 }

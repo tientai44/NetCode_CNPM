@@ -77,4 +77,8 @@ public class UIManager : MonoBehaviour
         }
         SpawnerController.Instance.SpawnObjects();
     }
+    void OnClickExitServer()
+    {
+        
+    }
 }

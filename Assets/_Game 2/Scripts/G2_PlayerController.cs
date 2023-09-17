@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System.Collections;
+using System.Collections.Generic;
 using System.Globalization;
 using Unity.Burst.CompilerServices;
 using Unity.Netcode;
@@ -45,7 +46,12 @@ namespace SkeletonEditor
         private NetworkVariable<float> networkSpeed = new NetworkVariable<float>();
         [SerializeField]
         private NetworkVariable<float> networkPlayerHealth = new NetworkVariable<float>(1000);
-
+        [SerializeField]
+        private NetworkVariable<float> networkMaxPlayerHealth = new NetworkVariable<float>(1000);
+        [SerializeField]
+        private float oldPlayerHealth;
+        private float oldMaxPlayerHealth;
+        private PlayerHud playerHud;
         private CharacterController characterController;
 
         // client caches positions
@@ -63,10 +69,13 @@ namespace SkeletonEditor
         private bool isCheckHit = true;
         [SerializeField] private ParticleSystem effectZone;
         [SerializeField] private ParticleSystem effectAttack;
+
+        Coroutine coroutineAttack;
+        Coroutine coroutineCheckHit;
         private void Awake()
         {
             characterController = GetComponent<CharacterController>();
-
+            playerHud = GetComponent<PlayerHud>();
         }
 
         void Start()
@@ -120,16 +129,19 @@ namespace SkeletonEditor
 
         private void ClientVisuals()
         {
-            Debug.Log(oldPlayerState);
-            Debug.Log(networkPlayerState.Value);
-            Debug.Log(oldPlayerState != networkPlayerState.Value);
+
             if (oldPlayerState != networkPlayerState.Value)
             {
                 
                 oldPlayerState = networkPlayerState.Value;
-                Debug.Log(oldPlayerState);
                 animator.Play(networkPlayerState.Value.ToString());
 
+            }
+            if(oldPlayerHealth != networkPlayerHealth.Value || oldMaxPlayerHealth !=networkMaxPlayerHealth.Value)
+            {
+                oldPlayerHealth = networkPlayerHealth.Value;
+                oldMaxPlayerHealth = networkMaxPlayerHealth.Value;
+                playerHud.SetHP(oldPlayerHealth, oldMaxPlayerHealth);
             }
         }
         private void CheckAlive()
@@ -161,6 +173,7 @@ namespace SkeletonEditor
             if (networkPlayerHealth.Value <= 0)
             {
                 UpdatePlayerStateServerRpc(G2_PlayerState.Die);
+                ExitServerRpc(OwnerClientId);
                 return;
             }
             if (ActivePunchActionKey() && forwardInput == 0 && !isAttacking && oldPlayerState != G2_PlayerState.Attack)
@@ -187,6 +200,9 @@ namespace SkeletonEditor
             if (oldInputPosition != inputPosition ||
                 oldInputRotation != inputRotation)
             {
+                CancelInvoke(nameof(SetCheckHit));
+                CancelInvoke(nameof(ResetAttack));
+                isAttacking = false;
                 oldInputPosition = inputPosition;
                 oldInputRotation = inputRotation;
                 UpdateClientPositionAndRotationServerRpc(inputPosition * walkSpeed, inputRotation * rotationSpeed);
@@ -238,7 +254,7 @@ namespace SkeletonEditor
 
             int layerMask = LayerMask.GetMask("Player");
 
-            if (Physics.Raycast(transform.position + Vector3.up * heightUpAttack, transform.forward, out hit, attackRange, layerMask))
+            if (Physics.SphereCast(transform.position + Vector3.up * heightUpAttack,1f, transform.forward, out hit, attackRange, layerMask))
             {
                 Debug.DrawRay(transform.position + Vector3.up * heightUpAttack, transform.forward * attackRange, Color.yellow);
 
@@ -287,6 +303,24 @@ namespace SkeletonEditor
             if (IsOwner) return;
 
             LoggerDebug.Instance.LogInfo($"Client got punch {takeAwayPoint}");
+        }
+        [ServerRpc]
+        public void ExitServerRpc(ulong clientId)
+        {
+            var client = NetworkManager.Singleton.ConnectedClients[clientId]
+                .PlayerObject.GetComponent<G2_PlayerController>();
+            client.ExitSever();
+        }
+        public void ExitSever()
+        {
+            Debug.Log("Exit");
+            StartCoroutine(IEExitServer());
+        }
+        public IEnumerator IEExitServer()
+        {
+            yield return new WaitForSeconds(4);
+            PlayersManager.Instance.DisconnectPlayer(GetComponent<NetworkObject>());
+
         }
     }
 }
