@@ -21,7 +21,7 @@ public class UIManager : MonoBehaviour
 
     private void Start()
     {
-        startSeverButton.onClick.AddListener(OnClickStartClientBtn);
+        startSeverButton.onClick.AddListener(OnClickStartServerBtn);
         startClientButton.onClick.AddListener(OnClickStartClientBtn);
         startHostButton.onClick.AddListener(OnClickStartHostBtn);
         executePhysicsButton.onClick.AddListener(OnClickExecutePhysics);

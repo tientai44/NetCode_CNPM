@@ -10,15 +10,17 @@ public class SpawnerController : NetworkBehaviour
     public static SpawnerController Instance;
     [SerializeField]
     private GameObject objectPrefab;
+    [SerializeField]
+    private GameObject effectAttack;
 
     [SerializeField]
     private int maxObjectInstanceCount = 3;
 
-    
+
     private void Awake()
     {
         Instance = this;
-        
+
     }
     private void Start()
     {
@@ -42,5 +44,12 @@ public class SpawnerController : NetworkBehaviour
 
 
         }
+    }
+    public void SpawnAttack(Vector3 pos)
+    {
+        if (!IsServer) return;
+
+        GameObject go = Instantiate(effectAttack,pos, Quaternion.identity);
+        go.GetComponent<NetworkObject>().Spawn();
     }
 }

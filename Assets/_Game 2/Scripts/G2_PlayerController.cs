@@ -1,5 +1,6 @@
 ﻿using System.Collections.Generic;
 using System.Globalization;
+using Unity.Burst.CompilerServices;
 using Unity.Netcode;
 using Unity.Netcode.Components;
 using Unity.VisualScripting;
@@ -50,17 +51,17 @@ namespace SkeletonEditor
         // client caches positions
         private Vector3 oldInputPosition = Vector3.zero;
         private Vector3 oldInputRotation = Vector3.zero;
-        private G2_PlayerState oldPlayerState = G2_PlayerState.Idle;
+        [SerializeField] private G2_PlayerState oldPlayerState = G2_PlayerState.Idle;
         private float speed;
         [SerializeField]
         private Animator animator;
 
-        private bool isAttacking =false;
+        private bool isAttacking = false;
         private float attackRange = 10f;
         private float heightUpAttack = 3;
         private float timeDelayCheckHit = 0.5f;
         private bool isCheckHit = true;
-        [SerializeField]private ParticleSystem effectZone;
+        [SerializeField] private ParticleSystem effectZone;
         [SerializeField] private ParticleSystem effectAttack;
         private void Awake()
         {
@@ -85,14 +86,13 @@ namespace SkeletonEditor
             {
                 ClientInput();
             }
-            
+
+
+
             ClientMoveAndRotate();
             ClientVisuals();
-            if (IsClient && IsOwner)
-            {
-                CheckAlive();
-
-            }
+            //CheckAlive();
+            
 
 
         }
@@ -120,10 +120,14 @@ namespace SkeletonEditor
 
         private void ClientVisuals()
         {
+            Debug.Log(oldPlayerState);
+            Debug.Log(networkPlayerState.Value);
+            Debug.Log(oldPlayerState != networkPlayerState.Value);
             if (oldPlayerState != networkPlayerState.Value)
             {
+                
                 oldPlayerState = networkPlayerState.Value;
-
+                Debug.Log(oldPlayerState);
                 animator.Play(networkPlayerState.Value.ToString());
 
             }
@@ -137,7 +141,7 @@ namespace SkeletonEditor
         }
         private void ClientInput()
         {
-            if(oldPlayerState == G2_PlayerState.Die)
+            if (oldPlayerState == G2_PlayerState.Die)
             {
                 return;
             }
@@ -152,17 +156,22 @@ namespace SkeletonEditor
             Vector3 direction = transform.TransformDirection(Vector3.forward);
             float forwardInput = v;
             Vector3 inputPosition = direction * forwardInput;
-        
+
             // change animation states
-            if (ActivePunchActionKey() && forwardInput == 0 && !isAttacking && oldPlayerState !=G2_PlayerState.Attack)
+            if (networkPlayerHealth.Value <= 0)
+            {
+                UpdatePlayerStateServerRpc(G2_PlayerState.Die);
+                return;
+            }
+            if (ActivePunchActionKey() && forwardInput == 0 && !isAttacking && oldPlayerState != G2_PlayerState.Attack)
             {
                 UpdatePlayerStateServerRpc(G2_PlayerState.Attack);
-                isAttacking=true;
+                isAttacking = true;
                 Invoke(nameof(ResetAttack), 2f);
                 Invoke(nameof(SetCheckHit), timeDelayCheckHit);
                 return;
             }
-            if (forwardInput == 0 && !isAttacking )
+            if (forwardInput == 0 && !isAttacking)
                 UpdatePlayerStateServerRpc(G2_PlayerState.Idle);
             else if (!ActiveRunningActionKey() && forwardInput > 0 && forwardInput <= 1)
                 UpdatePlayerStateServerRpc(G2_PlayerState.Walk);
@@ -185,7 +194,7 @@ namespace SkeletonEditor
         }
         private static bool ActivePunchActionKey()
         {
-            return Input.GetKey(KeyCode.Space);
+            return Input.GetKey(KeyCode.Z);
         }
         private static bool ActiveRunningActionKey()
         {
@@ -193,7 +202,7 @@ namespace SkeletonEditor
         }
         public void ResetAttack()
         {
-            isAttacking = false; 
+            isAttacking = false;
         }
         public void SetCheckHit()
         {
@@ -229,24 +238,28 @@ namespace SkeletonEditor
 
             int layerMask = LayerMask.GetMask("Player");
 
-            if (Physics.Raycast(transform.position + Vector3.up* heightUpAttack, transform.forward, out hit, attackRange, layerMask))
+            if (Physics.Raycast(transform.position + Vector3.up * heightUpAttack, transform.forward, out hit, attackRange, layerMask))
             {
-                Debug.DrawRay(transform.position + Vector3.up* heightUpAttack, transform.forward * attackRange, Color.yellow);
+                Debug.DrawRay(transform.position + Vector3.up * heightUpAttack, transform.forward * attackRange, Color.yellow);
 
                 var playerHit = hit.transform.GetComponent<NetworkObject>();
                 if (playerHit != null)
                 {
                     UpdateHealthServerRpc(500, playerHit.OwnerClientId);
-                    effectAttack.transform.position = hit.transform.position + Vector3.up *heightUpAttack;
-                    effectAttack.Play();
-                    effectAttack.GetComponent<NetworkObject>().Despawn();
+                    SpawnAttackServerRpc(hit.transform.position + Vector3.up * heightUpAttack);
                     Debug.Log("Attack a enemy");
                 }
             }
             else
             {
-                Debug.DrawRay(transform.position + Vector3.up* heightUpAttack, transform.forward * attackRange, Color.red);
+                Debug.DrawRay(transform.position + Vector3.up * heightUpAttack, transform.forward * attackRange, Color.red);
             }
+        }
+        [ServerRpc]
+        public void SpawnAttackServerRpc(Vector3 pos)
+        {
+            SpawnerController.Instance.SpawnAttack(pos);
+
         }
         [ServerRpc]
         public void UpdateHealthServerRpc(int takeAwayPoint, ulong clientId)
