@@ -79,13 +79,20 @@ namespace SkeletonEditor
             characterController = GetComponent<CharacterController>();
             playerHud = GetComponent<PlayerHud>();
         }
+        [ServerRpc]
+        void OnInitServerRpc()
+        {
+            UpdatePlayerStateServerRpc(G2_PlayerState.Idle);
+            networkPlayerHealth.Value = networkMaxPlayerHealth.Value;
+            transform.position = new Vector3(Random.Range(defaultInitialPositionOnPlane.x, defaultInitialPositionOnPlane.y), 0,
+                       Random.Range(defaultInitialPositionOnPlane.x, defaultInitialPositionOnPlane.y));
 
+        }
         void Start()
         {
             if (IsClient && IsOwner)
             {
-                transform.position = new Vector3(Random.Range(defaultInitialPositionOnPlane.x, defaultInitialPositionOnPlane.y), 0,
-                       Random.Range(defaultInitialPositionOnPlane.x, defaultInitialPositionOnPlane.y));
+                
                 G2_CameraFollow.Instance.SetTarget(transform);
                 effectZone.Play();
             }
@@ -175,7 +182,8 @@ namespace SkeletonEditor
             if (networkPlayerHealth.Value <= 0)
             {
                 UpdatePlayerStateServerRpc(G2_PlayerState.Die);
-                ExitServerRpc(OwnerClientId);
+                //ExitServerRpc(OwnerClientId);
+                Invoke(nameof(OnInitServerRpc), 4);
                 return;
             }
             if (ActivePunchActionKey() && forwardInput == 0 && !isAttacking && oldPlayerState != G2_PlayerState.Attack)
@@ -319,6 +327,7 @@ namespace SkeletonEditor
                 .PlayerObject.GetComponent<G2_PlayerController>();
             client.ExitSever();
         }
+        
         public void ExitSever()
         {
             Debug.Log("Exit");
