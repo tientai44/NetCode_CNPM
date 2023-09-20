@@ -408,6 +408,8 @@ MonoBehaviour:
     PrewarmCount: 10
   - Prefab: {fileID: 7126264376468390104, guid: eb50864f22d592d4ca666cf2a6507234, type: 3}
     PrewarmCount: 10
+  - Prefab: {fileID: 2207421776584407272, guid: c36027d36e8e0a64aae855c3f1c48886, type: 3}
+    PrewarmCount: 10
 --- !u!1 &846758625
 GameObject:
   m_ObjectHideFlags: 0

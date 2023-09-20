@@ -284,14 +284,21 @@ namespace SkeletonEditor
         [ServerRpc]
         public void SkillEffectServerRpc(Vector3 pos)
         {
-            NetworkObject networkObject = Instantiate(skillEffect,pos,transform.rotation).GetComponent<NetworkObject>();
+            NetworkObject networkObject = NetworkObjectPool.Singleton.GetNetworkObject(skillEffect, pos, transform.rotation);
             networkObject.Spawn(true);
+            StartCoroutine(ReturnSkillEffect(1f,networkObject));
         }
         [ServerRpc]
         public void SpawnAttackServerRpc(Vector3 pos)
         {
             SpawnerController.Instance.SpawnAttackHitEffect(pos);
 
+        }
+        IEnumerator ReturnSkillEffect(float time,NetworkObject networkObject)
+        {
+            yield return new WaitForSeconds(time);
+            NetworkObjectPool.Singleton.ReturnNetworkObject(networkObject, skillEffect);
+            networkObject.Despawn(false);
         }
         [ServerRpc]
         public void UpdateHealthServerRpc(int takeAwayPoint, ulong clientId)
