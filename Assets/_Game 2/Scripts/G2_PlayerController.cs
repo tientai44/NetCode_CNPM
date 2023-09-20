@@ -285,12 +285,12 @@ namespace SkeletonEditor
         public void SkillEffectServerRpc(Vector3 pos)
         {
             NetworkObject networkObject = Instantiate(skillEffect,pos,transform.rotation).GetComponent<NetworkObject>();
-            networkObject.Spawn();
+            networkObject.Spawn(true);
         }
         [ServerRpc]
         public void SpawnAttackServerRpc(Vector3 pos)
         {
-            SpawnerController.Instance.SpawnAttack(pos);
+            SpawnerController.Instance.SpawnAttackHitEffect(pos);
 
         }
         [ServerRpc]

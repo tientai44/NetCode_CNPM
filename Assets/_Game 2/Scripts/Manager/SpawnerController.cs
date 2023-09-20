@@ -36,20 +36,35 @@ public class SpawnerController : NetworkBehaviour
 
         for (int i = 0; i < maxObjectInstanceCount; i++)
         {
-            GameObject go = Instantiate(objectPrefab,
-                new Vector3(Random.Range(-10, 10), 10.0f, Random.Range(-10, 10)), Quaternion.identity);
-            //GameObject go = NetworkObjectPool.Instance.GetNetworkObject(objectPrefab).gameObject;
-            //go.transform.position = new Vector3(Random.Range(-10, 10), 10.0f, Random.Range(-10, 10));
-            go.GetComponent<NetworkObject>().Spawn();
+            //GameObject go = Instantiate(objectPrefab,
+            //    new Vector3(Random.Range(-10, 10), 10.0f, Random.Range(-10, 10)), Quaternion.identity);
+            NetworkObject networkObject = NetworkObjectPool.Singleton.GetNetworkObject(objectPrefab, new Vector3(Random.Range(-10, 10), 10.0f, Random.Range(-10, 10)), Quaternion.identity);
+            networkObject.Spawn(true);
 
 
         }
     }
-    public void SpawnAttack(Vector3 pos)
+    public void GetBackObject(NetworkObject networkObject)
+    {
+        if (!IsServer) return;
+        NetworkObjectPool.Singleton.ReturnNetworkObject(networkObject,objectPrefab);
+        networkObject.Despawn(false);
+
+
+    }
+    public void SpawnAttackHitEffect(Vector3 pos)
     {
         if (!IsServer) return;
 
-        GameObject go = Instantiate(effectAttack,pos, Quaternion.identity);
-        go.GetComponent<NetworkObject>().Spawn();
+        NetworkObject networkObject = NetworkObjectPool.Singleton.GetNetworkObject(effectAttack, pos, Quaternion.identity);
+        networkObject.Spawn(true);
+        networkObject.GetComponent<ParticleSystem>().Play();
+        StartCoroutine(IEReturnAttackHitEffect(networkObject,1f));
+    }
+    public IEnumerator IEReturnAttackHitEffect(NetworkObject networkObject,float time)
+    {
+        yield return new WaitForSeconds(time);
+        NetworkObjectPool.Singleton.ReturnNetworkObject(networkObject, effectAttack);
+        networkObject.Despawn(false);
     }
 }

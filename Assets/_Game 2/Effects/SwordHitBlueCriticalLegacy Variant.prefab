@@ -57,7 +57,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 19817506, guid: 2cb34d37990ddde43be5bcb068f772bc, type: 3}
       propertyPath: stopAction
-      value: 2
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 19817506, guid: 2cb34d37990ddde43be5bcb068f772bc, type: 3}
       propertyPath: SizeModule.y.minMaxState

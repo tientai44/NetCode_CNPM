@@ -9,8 +9,7 @@ public class G2_Booster : NetworkBehaviour
     {
         if (other.CompareTag("Player"))
         {
-            Debug.Log(other.name);
-            Destroy(gameObject);
+            SpawnerController.Instance.GetBackObject(NetworkObject);
         }
     }
 }

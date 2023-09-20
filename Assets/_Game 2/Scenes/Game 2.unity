@@ -337,6 +337,7 @@ GameObject:
   - component: {fileID: 584052358}
   - component: {fileID: 584052360}
   - component: {fileID: 584052359}
+  - component: {fileID: 584052361}
   m_Layer: 0
   m_Name: SpawnerController
   m_TagString: Untagged
@@ -390,6 +391,23 @@ MonoBehaviour:
   objectPrefab: {fileID: 6884031892285570435, guid: 0bd1f62aa6995de448e3b0756df7cc35, type: 3}
   effectAttack: {fileID: 7126264376468390104, guid: eb50864f22d592d4ca666cf2a6507234, type: 3}
   maxObjectInstanceCount: 3
+--- !u!114 &584052361
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 584052357}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 102cd487e4d90954bb2b3a800f3f2a53, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  PooledPrefabsList:
+  - Prefab: {fileID: 6884031892285570435, guid: 0bd1f62aa6995de448e3b0756df7cc35, type: 3}
+    PrewarmCount: 10
+  - Prefab: {fileID: 7126264376468390104, guid: eb50864f22d592d4ca666cf2a6507234, type: 3}
+    PrewarmCount: 10
 --- !u!1 &846758625
 GameObject:
   m_ObjectHideFlags: 0
