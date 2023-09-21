@@ -1,3 +1,4 @@
+using SkeletonEditor;
 using System.Collections;
 using System.Collections.Generic;
 using Unity.Netcode;
@@ -9,7 +10,12 @@ public class G2_Booster : NetworkBehaviour
     {
         if (other.CompareTag("Player"))
         {
+            G2_PlayerController player = other.GetComponent<G2_PlayerController>();
+            player.networkPlayerHealth.Value += 200;
             SpawnerController.Instance.GetBackObject(NetworkObject);
+
         }
     }
+
+   
 }

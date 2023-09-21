@@ -2477,6 +2477,18 @@ PrefabInstance:
   m_Modification:
     m_TransformParent: {fileID: 8174940822121711698}
     m_Modifications:
+    - target: {fileID: 2414283700521750207, guid: 046e13c6d2752b14d827d6839b12715e, type: 3}
+      propertyPath: m_Materials.Array.data[0]
+      value: 
+      objectReference: {fileID: 2100000, guid: 750a86439c7519f4bbb45ff3aed99467, type: 2}
+    - target: {fileID: 6894845925722446662, guid: 046e13c6d2752b14d827d6839b12715e, type: 3}
+      propertyPath: m_Materials.Array.data[0]
+      value: 
+      objectReference: {fileID: 2100000, guid: 750a86439c7519f4bbb45ff3aed99467, type: 2}
+    - target: {fileID: 8171926971623486108, guid: 046e13c6d2752b14d827d6839b12715e, type: 3}
+      propertyPath: m_Materials.Array.data[0]
+      value: 
+      objectReference: {fileID: 2100000, guid: 750a86439c7519f4bbb45ff3aed99467, type: 2}
     - target: {fileID: 8296012142041130240, guid: 046e13c6d2752b14d827d6839b12715e, type: 3}
       propertyPath: m_RootOrder
       value: 3
@@ -2537,6 +2549,10 @@ PrefabInstance:
       propertyPath: m_Name
       value: WarriorModel
       objectReference: {fileID: 0}
+    - target: {fileID: 9011721422758012538, guid: 046e13c6d2752b14d827d6839b12715e, type: 3}
+      propertyPath: m_Materials.Array.data[0]
+      value: 
+      objectReference: {fileID: 2100000, guid: 750a86439c7519f4bbb45ff3aed99467, type: 2}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 046e13c6d2752b14d827d6839b12715e, type: 3}
 --- !u!4 &483216113091400553 stripped

@@ -45,7 +45,7 @@ namespace SkeletonEditor
         [SerializeField]
         private NetworkVariable<float> networkSpeed = new NetworkVariable<float>();
         [SerializeField]
-        private NetworkVariable<float> networkPlayerHealth = new NetworkVariable<float>(1000);
+        public NetworkVariable<float> networkPlayerHealth = new NetworkVariable<float>(1000);
         [SerializeField]
         private NetworkVariable<float> networkMaxPlayerHealth = new NetworkVariable<float>(1000);
         [SerializeField]
@@ -67,6 +67,7 @@ namespace SkeletonEditor
         private float heightUpAttack = 4;
         private float timeDelayCheckHit = 0.5f;
         private bool isCheckHit = true;
+        private float damage = 100;
         [SerializeField] private GameObject skillEffect;
 
         [SerializeField] private ParticleSystem effectZone;
@@ -104,15 +105,9 @@ namespace SkeletonEditor
             {
                 ClientInput();
             }
-
-
-
             ClientMoveAndRotate();
             ClientVisuals();
             //CheckAlive();
-            
-
-
         }
         private void FixedUpdate()
         {
@@ -271,7 +266,7 @@ namespace SkeletonEditor
                 var playerHit = hit.transform.GetComponent<NetworkObject>();
                 if (playerHit != null)
                 {
-                    UpdateHealthServerRpc(500, playerHit.OwnerClientId);
+                    UpdateHealthServerRpc(damage, playerHit.OwnerClientId,OwnerClientId);
                     SpawnAttackServerRpc(hit.transform.position + Vector3.up * heightUpAttack);
                     Debug.Log("Attack a enemy");
                 }
@@ -300,8 +295,17 @@ namespace SkeletonEditor
             NetworkObjectPool.Singleton.ReturnNetworkObject(networkObject, skillEffect);
             networkObject.Despawn(false);
         }
+        public void EatBooster(float takeAwayPoint)
+        {
+            UpdateHealthServerRpc(takeAwayPoint);
+        }
         [ServerRpc]
-        public void UpdateHealthServerRpc(int takeAwayPoint, ulong clientId)
+        public void UpdateHealthServerRpc(float takeAwayPoint)
+        {
+            networkPlayerHealth.Value += takeAwayPoint;
+        }
+        [ServerRpc]
+        public void UpdateHealthServerRpc(float takeAwayPoint, ulong clientId,ulong attackerId)
         {
             var clientWithDamaged = NetworkManager.Singleton.ConnectedClients[clientId]
                 .PlayerObject.GetComponent<G2_PlayerController>();
@@ -312,7 +316,7 @@ namespace SkeletonEditor
             }
 
             // execute method on a client getting punch
-            NotifyHealthChangedClientRpc(takeAwayPoint, new ClientRpcParams
+            NotifyHealthChangedClientRpc(takeAwayPoint,attackerId, new ClientRpcParams
             {
                 Send = new ClientRpcSendParams
                 {
@@ -321,11 +325,11 @@ namespace SkeletonEditor
             });
         }
         [ClientRpc]
-        public void NotifyHealthChangedClientRpc(int takeAwayPoint, ClientRpcParams clientRpcParams = default)
+        public void NotifyHealthChangedClientRpc(float takeAwayPoint,ulong attackerId, ClientRpcParams clientRpcParams = default)
         {
             if (IsOwner) return;
 
-            LoggerDebug.Instance.LogInfo($"Client got punch {takeAwayPoint}");
+            LoggerDebug.Instance.LogInfo($"Client got punch {takeAwayPoint} by Player {attackerId}");
         }
         [ServerRpc]
         public void ExitServerRpc(ulong clientId)
@@ -346,5 +350,6 @@ namespace SkeletonEditor
             PlayersManager.Instance.DisconnectPlayer(GetComponent<NetworkObject>());
 
         }
+        
     }
 }
