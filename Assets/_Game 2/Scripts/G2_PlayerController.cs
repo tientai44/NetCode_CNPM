@@ -52,6 +52,8 @@ namespace SkeletonEditor
         [SerializeField]
         private NetworkVariable<int> networkLevel = new NetworkVariable<int>(1);
         [SerializeField]
+        private NetworkVariable<float> networkDamage = new NetworkVariable<float>(300);
+        [SerializeField]
         private float oldPlayerHealth;
         private float oldMaxPlayerHealth;
         private int oldLevel;
@@ -91,7 +93,9 @@ namespace SkeletonEditor
         {
             UpdatePlayerStateServerRpc(G2_PlayerState.Idle);
             networkLevel.Value = 1;
-            networkPlayerHealth.Value = networkMaxPlayerHealth.Value;
+            networkMaxPlayerHealth.Value =  G2_StaticData.INTIAL_HEALTH;
+            networkPlayerHealth.Value =  G2_StaticData.INTIAL_HEALTH;
+            networkDamage.Value =  G2_StaticData.INTIAL_DAMAGE;
             transform.position = new Vector3(Random.Range(defaultInitialPositionOnPlane.x, defaultInitialPositionOnPlane.y), 0,
                        Random.Range(defaultInitialPositionOnPlane.x, defaultInitialPositionOnPlane.y));
 
@@ -298,6 +302,9 @@ namespace SkeletonEditor
                 return;
             }
             networkLevel.Value += val;
+            networkMaxPlayerHealth.Value += val * G2_StaticData.INC_HEALTH_PER_LEVEL;
+            networkPlayerHealth.Value += val * G2_StaticData.INC_HEALTH_PER_LEVEL;
+            networkDamage.Value += val * G2_StaticData.INC_DAMAGE_PER_LEVEL;
         }
         private void CheckHit()
         {
@@ -359,7 +366,6 @@ namespace SkeletonEditor
             }
             networkPlayerHealth.Value += takeAwayPoint;
             networkPlayerHealth.Value = networkPlayerHealth.Value > networkMaxPlayerHealth.Value ? networkMaxPlayerHealth.Value : networkPlayerHealth.Value;
-            buffHpEffect.Play();
         }
         [ServerRpc]
         public void UpdateHealthServerRpc(float takeAwayPoint, ulong clientId,ulong attackerId)
