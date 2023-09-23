@@ -1,4 +1,5 @@
-﻿using System.Collections;
+﻿using DG.Tweening;
+using System.Collections;
 using System.Collections.Generic;
 using System.Globalization;
 using Unity.Burst.CompilerServices;
@@ -45,12 +46,15 @@ namespace SkeletonEditor
         [SerializeField]
         private NetworkVariable<float> networkSpeed = new NetworkVariable<float>();
         [SerializeField]
-        public NetworkVariable<float> networkPlayerHealth = new NetworkVariable<float>(1000);
+        private NetworkVariable<float> networkPlayerHealth = new NetworkVariable<float>(1000);
         [SerializeField]
         private NetworkVariable<float> networkMaxPlayerHealth = new NetworkVariable<float>(1000);
         [SerializeField]
+        private NetworkVariable<int> networkLevel = new NetworkVariable<int>(1);
+        [SerializeField]
         private float oldPlayerHealth;
         private float oldMaxPlayerHealth;
+        private int oldLevel;
         private PlayerHud playerHud;
         private CharacterController characterController;
 
@@ -67,12 +71,14 @@ namespace SkeletonEditor
         private float heightUpAttack = 4;
         private float timeDelayCheckHit = 0.5f;
         private bool isCheckHit = true;
-        private float damage = 100;
+        private float damage = 300;
         [SerializeField] private GameObject skillEffect;
 
         [SerializeField] private ParticleSystem effectZone;
         [SerializeField] private ParticleSystem effectAttack;
-
+        [SerializeField] private ParticleSystem dieEffect;
+        [SerializeField] private ParticleSystem buffHpEffect;
+        [SerializeField] private ParticleSystem levelUpEffect;
         Coroutine coroutineAttack;
         Coroutine coroutineCheckHit;
         private void Awake()
@@ -84,6 +90,7 @@ namespace SkeletonEditor
         void OnInitServerRpc()
         {
             UpdatePlayerStateServerRpc(G2_PlayerState.Idle);
+            networkLevel.Value = 1;
             networkPlayerHealth.Value = networkMaxPlayerHealth.Value;
             transform.position = new Vector3(Random.Range(defaultInitialPositionOnPlane.x, defaultInitialPositionOnPlane.y), 0,
                        Random.Range(defaultInitialPositionOnPlane.x, defaultInitialPositionOnPlane.y));
@@ -113,10 +120,17 @@ namespace SkeletonEditor
         {
             if (IsClient && IsOwner)
             {
-                if (networkPlayerState.Value == G2_PlayerState.Attack)
+                switch (networkPlayerState.Value)
                 {
-                    CheckHit();
+                    case G2_PlayerState.Attack:
+                        CheckHit();
+                        break;
+                    default:
+                        break;
+
                 }
+             
+                
             }
         }
         private void ClientMoveAndRotate()
@@ -140,12 +154,40 @@ namespace SkeletonEditor
                 oldPlayerState = networkPlayerState.Value;
                 animator.Play(networkPlayerState.Value.ToString());
 
+                switch (oldPlayerState)
+                {
+                    case G2_PlayerState.Die:
+                        DOVirtual.DelayedCall(1f, () =>
+                        {
+                            dieEffect.gameObject.SetActive(true);
+                            dieEffect.Play();
+                        });
+                        break;
+                    default:
+                        dieEffect.gameObject.SetActive(false);
+                        break;
+                }
+
             }
-            if(oldPlayerHealth != networkPlayerHealth.Value || oldMaxPlayerHealth !=networkMaxPlayerHealth.Value)
+            if (oldPlayerHealth != networkPlayerHealth.Value || oldMaxPlayerHealth !=networkMaxPlayerHealth.Value)
             {
+                if(oldPlayerHealth < networkPlayerHealth.Value)
+                {
+                    buffHpEffect.Play();
+                }
                 oldPlayerHealth = networkPlayerHealth.Value;
                 oldMaxPlayerHealth = networkMaxPlayerHealth.Value;
                 playerHud.SetHP(oldPlayerHealth, oldMaxPlayerHealth);
+            }
+            if(oldLevel != networkLevel.Value)
+            {
+                if (oldLevel < networkLevel.Value)
+                {
+                    levelUpEffect.Play();
+
+                }
+                oldLevel = networkLevel.Value;
+                playerHud.SetLevel(oldLevel);
             }
         }
         private void CheckAlive()
@@ -153,7 +195,9 @@ namespace SkeletonEditor
             if (networkPlayerHealth.Value <= 0)
             {
                 UpdatePlayerStateServerRpc(G2_PlayerState.Die);
+                
             }
+            
         }
         private void ClientInput()
         {
@@ -178,6 +222,7 @@ namespace SkeletonEditor
             {
                 UpdatePlayerStateServerRpc(G2_PlayerState.Die);
                 //ExitServerRpc(OwnerClientId);
+                
                 Invoke(nameof(OnInitServerRpc), 4);
                 return;
             }
@@ -246,7 +291,14 @@ namespace SkeletonEditor
         {
             networkSpeed.Value = speed;
         }
-
+        public void LevelUp(int val=1)
+        {
+            if (oldPlayerState == G2_PlayerState.Die)
+            {
+                return;
+            }
+            networkLevel.Value += val;
+        }
         private void CheckHit()
         {
             if (isCheckHit)
@@ -297,12 +349,17 @@ namespace SkeletonEditor
         }
         public void EatBooster(float takeAwayPoint)
         {
-            UpdateHealthServerRpc(takeAwayPoint);
-        }
-        [ServerRpc]
-        public void UpdateHealthServerRpc(float takeAwayPoint)
-        {
             networkPlayerHealth.Value += takeAwayPoint;
+        }
+        public void IncreaseHealth(float takeAwayPoint)
+        {
+            if (oldPlayerState == G2_PlayerState.Die)
+            {
+                return;
+            }
+            networkPlayerHealth.Value += takeAwayPoint;
+            networkPlayerHealth.Value = networkPlayerHealth.Value > networkMaxPlayerHealth.Value ? networkMaxPlayerHealth.Value : networkPlayerHealth.Value;
+            buffHpEffect.Play();
         }
         [ServerRpc]
         public void UpdateHealthServerRpc(float takeAwayPoint, ulong clientId,ulong attackerId)
@@ -313,6 +370,12 @@ namespace SkeletonEditor
             if (clientWithDamaged != null && clientWithDamaged.networkPlayerHealth.Value > 0)
             {
                 clientWithDamaged.networkPlayerHealth.Value -= takeAwayPoint;
+                if(clientWithDamaged.networkPlayerHealth.Value <= 0)
+                {
+                    var attacker = NetworkManager.Singleton.ConnectedClients[attackerId]
+                .PlayerObject.GetComponent<G2_PlayerController>();
+                    attacker.LevelUp();
+                }
             }
 
             // execute method on a client getting punch

@@ -12,11 +12,14 @@ public class PlayerHud : NetworkBehaviour
 {
     [SerializeField]
     private NetworkVariable<NetworkString> playersName = new NetworkVariable<NetworkString>();
+
     [SerializeField]
     private G2_PlayerController player;
-
+    [SerializeField] TextMeshProUGUI nameText;
+    [SerializeField] TextMeshProUGUI levelText;
     [SerializeField] Image hpImgFill;
     private bool overlaySet = false;
+    
 
     private void Awake()
     {
@@ -31,8 +34,11 @@ public class PlayerHud : NetworkBehaviour
     }
     public void SetOverlay()
     {
-        var localPlayerOverlay = gameObject.GetComponentInChildren<TextMeshProUGUI>();
-        localPlayerOverlay.text = playersName.Value;
+        nameText.text = playersName.Value;
+    }
+    public void SetLevel(int level)
+    {
+        levelText.text = level.ToString();
     }
     public void SetHP(float currentHP,float maxHP)
     {     

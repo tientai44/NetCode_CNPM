@@ -11,7 +11,7 @@ public class G2_Booster : NetworkBehaviour
         if (other.CompareTag("Player"))
         {
             G2_PlayerController player = other.GetComponent<G2_PlayerController>();
-            player.networkPlayerHealth.Value += 200;
+            player.IncreaseHealth(200);
             SpawnerController.Instance.GetBackObject(NetworkObject);
 
         }
