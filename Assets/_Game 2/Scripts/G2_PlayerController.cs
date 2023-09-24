@@ -81,6 +81,8 @@ namespace SkeletonEditor
         [SerializeField] private ParticleSystem dieEffect;
         [SerializeField] private ParticleSystem buffHpEffect;
         [SerializeField] private ParticleSystem levelUpEffect;
+        [SerializeField] private ParticleSystem buffDameEffect;
+        [SerializeField] private ParticleSystem buffSpeedEffect;
         Coroutine coroutineAttack;
         Coroutine coroutineCheckHit;
         private void Awake()
@@ -196,7 +198,20 @@ namespace SkeletonEditor
             }
             if(walkSpeed != networkSpeed.Value)
             {
+                if (walkSpeed < networkSpeed.Value)
+                {
+                    buffSpeedEffect.Play();
+
+                }
                 walkSpeed = networkSpeed.Value;
+            }
+            if(damage != networkDamage.Value)
+            {
+                if(damage < networkDamage.Value)
+                {
+                    buffDameEffect.Play();
+                }
+                damage = networkDamage.Value;
             }
         }
         private void CheckAlive()
