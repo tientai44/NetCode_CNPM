@@ -38,9 +38,11 @@ public class SpawnerController : NetworkBehaviour
         {
             //GameObject go = Instantiate(objectPrefab,
             //    new Vector3(Random.Range(-10, 10), 10.0f, Random.Range(-10, 10)), Quaternion.identity);
+            List<G2_BoosterType> lst = new List<G2_BoosterType> { G2_BoosterType.BuffHp, G2_BoosterType.BuffDame, G2_BoosterType.LevelUp, G2_BoosterType.SpeedUp };
+
             NetworkObject networkObject = NetworkObjectPool.Singleton.GetNetworkObject(objectPrefab, new Vector3(Random.Range(-10, 10), 10.0f, Random.Range(-10, 10)), Quaternion.identity);
             networkObject.Spawn(true);
-
+            networkObject.GetComponent<G2_Booster>().SetType(lst[Random.Range(0,lst.Count)]);
 
         }
     }

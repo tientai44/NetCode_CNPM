@@ -44,7 +44,7 @@ namespace SkeletonEditor
         [SerializeField]
         private NetworkVariable<G2_PlayerState> networkPlayerState = new NetworkVariable<G2_PlayerState>();
         [SerializeField]
-        private NetworkVariable<float> networkSpeed = new NetworkVariable<float>();
+        private NetworkVariable<float> networkSpeed = new NetworkVariable<float>(3.5f);
         [SerializeField]
         private NetworkVariable<float> networkPlayerHealth = new NetworkVariable<float>(1000);
         [SerializeField]
@@ -96,9 +96,10 @@ namespace SkeletonEditor
             networkMaxPlayerHealth.Value =  G2_StaticData.INTIAL_HEALTH;
             networkPlayerHealth.Value =  G2_StaticData.INTIAL_HEALTH;
             networkDamage.Value =  G2_StaticData.INTIAL_DAMAGE;
+            gameObject.SetActive(false);
             transform.position = new Vector3(Random.Range(defaultInitialPositionOnPlane.x, defaultInitialPositionOnPlane.y), 0,
                        Random.Range(defaultInitialPositionOnPlane.x, defaultInitialPositionOnPlane.y));
-
+            gameObject.SetActive(true);
         }
         void Start()
         {
@@ -193,6 +194,10 @@ namespace SkeletonEditor
                 oldLevel = networkLevel.Value;
                 playerHud.SetLevel(oldLevel);
             }
+            if(walkSpeed != networkSpeed.Value)
+            {
+                walkSpeed = networkSpeed.Value;
+            }
         }
         private void CheckAlive()
         {
@@ -212,7 +217,6 @@ namespace SkeletonEditor
             float h = Input.GetAxis("Horizontal");
             float v = Input.GetAxis("Vertical");
             speed = Mathf.Abs(v) * walkSpeed;
-            UpdateCurrentSpeedServerRpc(speed);
             // left & right rotation
             Vector3 inputRotation = new Vector3(0, h, 0);
 
@@ -366,6 +370,22 @@ namespace SkeletonEditor
             }
             networkPlayerHealth.Value += takeAwayPoint;
             networkPlayerHealth.Value = networkPlayerHealth.Value > networkMaxPlayerHealth.Value ? networkMaxPlayerHealth.Value : networkPlayerHealth.Value;
+        }
+        public void IncreaseDamage(float takeAwayPoint)
+        {
+            if (oldPlayerState == G2_PlayerState.Die)
+            {
+                return;
+            }
+            networkDamage.Value += takeAwayPoint;
+        }
+        public void SpeedUp(float takeAwayPoint)
+        {
+            if (oldPlayerState == G2_PlayerState.Die)
+            {
+                return;
+            }
+            networkSpeed.Value += takeAwayPoint;
         }
         [ServerRpc]
         public void UpdateHealthServerRpc(float takeAwayPoint, ulong clientId,ulong attackerId)
