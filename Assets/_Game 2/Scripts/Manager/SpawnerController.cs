@@ -12,9 +12,10 @@ public class SpawnerController : NetworkBehaviour
     private GameObject objectPrefab;
     [SerializeField]
     private GameObject effectAttack;
-
     [SerializeField]
-    private int maxObjectInstanceCount = 3;
+    private GameObject monsterPrefab;
+    [SerializeField]
+    private int maxObjectInstanceCount = 10;
 
 
     private void Awake()
@@ -40,16 +41,27 @@ public class SpawnerController : NetworkBehaviour
             //    new Vector3(Random.Range(-10, 10), 10.0f, Random.Range(-10, 10)), Quaternion.identity);
             List<G2_BoosterType> lst = new List<G2_BoosterType> { G2_BoosterType.BuffHp, G2_BoosterType.BuffDame, G2_BoosterType.LevelUp, G2_BoosterType.SpeedUp };
 
-            NetworkObject networkObject = NetworkObjectPool.Singleton.GetNetworkObject(objectPrefab, new Vector3(Random.Range(-10, 10), 10.0f, Random.Range(-10, 10)), Quaternion.identity);
+            NetworkObject networkObject = NetworkObjectPool.Singleton.GetNetworkObject(objectPrefab, new Vector3(Random.Range(-100, 100), 10.0f, Random.Range(-100, 100)), Quaternion.identity);
             networkObject.Spawn(true);
-            networkObject.GetComponent<G2_Booster>().SetType(lst[Random.Range(0,lst.Count)]);
+            networkObject.GetComponent<G2_Booster>().SetType(lst[Random.Range(0, lst.Count)]);
 
         }
+    }
+    public void SpawnMonsters()
+    {
+        if (!IsServer) return;
+
+
+
+
+        NetworkObject networkObject = NetworkObjectPool.Singleton.GetNetworkObject(monsterPrefab, new Vector3(Random.Range(-10, 10),0, Random.Range(-10, 10)), Quaternion.identity);
+        networkObject.Spawn(true);
+
     }
     public void GetBackObject(NetworkObject networkObject)
     {
         if (!IsServer) return;
-        NetworkObjectPool.Singleton.ReturnNetworkObject(networkObject,objectPrefab);
+        NetworkObjectPool.Singleton.ReturnNetworkObject(networkObject, objectPrefab);
         networkObject.Despawn(false);
 
 
@@ -61,9 +73,9 @@ public class SpawnerController : NetworkBehaviour
         NetworkObject networkObject = NetworkObjectPool.Singleton.GetNetworkObject(effectAttack, pos, Quaternion.identity);
         networkObject.Spawn(true);
         networkObject.GetComponent<ParticleSystem>().Play();
-        StartCoroutine(IEReturnAttackHitEffect(networkObject,1f));
+        StartCoroutine(IEReturnAttackHitEffect(networkObject, 1f));
     }
-    public IEnumerator IEReturnAttackHitEffect(NetworkObject networkObject,float time)
+    public IEnumerator IEReturnAttackHitEffect(NetworkObject networkObject, float time)
     {
         yield return new WaitForSeconds(time);
         NetworkObjectPool.Singleton.ReturnNetworkObject(networkObject, effectAttack);
