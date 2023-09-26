@@ -17,6 +17,7 @@ public class NetworkObjectPool : NetworkBehaviour
 
     Dictionary<GameObject, ObjectPool<NetworkObject>> m_PooledObjects = new Dictionary<GameObject, ObjectPool<NetworkObject>>();
 
+
     public void Awake()
     {
         if (Singleton != null && Singleton != this)
@@ -83,7 +84,7 @@ public class NetworkObjectPool : NetworkBehaviour
         var noTransform = networkObject.transform;
         noTransform.position = position;
         noTransform.rotation = rotation;
-
+   
         return networkObject;
     }
 

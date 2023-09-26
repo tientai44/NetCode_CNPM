@@ -95,9 +95,9 @@ namespace SkeletonEditor
         {
             UpdatePlayerStateServerRpc(G2_PlayerState.Idle);
             networkLevel.Value = 1;
-            networkMaxPlayerHealth.Value =  G2_StaticData.INTIAL_HEALTH;
-            networkPlayerHealth.Value =  G2_StaticData.INTIAL_HEALTH;
-            networkDamage.Value =  G2_StaticData.INTIAL_DAMAGE;
+            networkMaxPlayerHealth.Value = G2_StaticData.INTIAL_HEALTH;
+            networkPlayerHealth.Value = G2_StaticData.INTIAL_HEALTH;
+            networkDamage.Value = G2_StaticData.INTIAL_DAMAGE;
             gameObject.SetActive(false);
             transform.position = new Vector3(Random.Range(defaultInitialPositionOnPlane.x, defaultInitialPositionOnPlane.y), 0,
                        Random.Range(defaultInitialPositionOnPlane.x, defaultInitialPositionOnPlane.y));
@@ -107,7 +107,7 @@ namespace SkeletonEditor
         {
             if (IsClient && IsOwner)
             {
-                
+
                 G2_CameraFollow.Instance.SetTarget(transform);
                 effectZone.Play();
             }
@@ -136,8 +136,8 @@ namespace SkeletonEditor
                         break;
 
                 }
-             
-                
+
+
             }
         }
         private void ClientMoveAndRotate()
@@ -157,7 +157,7 @@ namespace SkeletonEditor
 
             if (oldPlayerState != networkPlayerState.Value)
             {
-                
+
                 oldPlayerState = networkPlayerState.Value;
                 animator.Play(networkPlayerState.Value.ToString());
 
@@ -176,9 +176,9 @@ namespace SkeletonEditor
                 }
 
             }
-            if (oldPlayerHealth != networkPlayerHealth.Value || oldMaxPlayerHealth !=networkMaxPlayerHealth.Value)
+            if (oldPlayerHealth != networkPlayerHealth.Value || oldMaxPlayerHealth != networkMaxPlayerHealth.Value)
             {
-                if(oldPlayerHealth < networkPlayerHealth.Value)
+                if (oldPlayerHealth < networkPlayerHealth.Value)
                 {
                     buffHpEffect.Play();
                 }
@@ -186,7 +186,7 @@ namespace SkeletonEditor
                 oldMaxPlayerHealth = networkMaxPlayerHealth.Value;
                 playerHud.SetHP(oldPlayerHealth, oldMaxPlayerHealth);
             }
-            if(oldLevel != networkLevel.Value)
+            if (oldLevel != networkLevel.Value)
             {
                 if (oldLevel < networkLevel.Value)
                 {
@@ -196,7 +196,7 @@ namespace SkeletonEditor
                 oldLevel = networkLevel.Value;
                 playerHud.SetLevel(oldLevel);
             }
-            if(walkSpeed != networkSpeed.Value)
+            if (walkSpeed != networkSpeed.Value)
             {
                 if (walkSpeed < networkSpeed.Value)
                 {
@@ -205,9 +205,9 @@ namespace SkeletonEditor
                 }
                 walkSpeed = networkSpeed.Value;
             }
-            if(damage != networkDamage.Value)
+            if (damage != networkDamage.Value)
             {
-                if(damage < networkDamage.Value)
+                if (damage < networkDamage.Value)
                 {
                     buffDameEffect.Play();
                 }
@@ -219,9 +219,9 @@ namespace SkeletonEditor
             if (networkPlayerHealth.Value <= 0)
             {
                 UpdatePlayerStateServerRpc(G2_PlayerState.Die);
-                
+
             }
-            
+
         }
         private void ClientInput()
         {
@@ -245,7 +245,7 @@ namespace SkeletonEditor
             {
                 UpdatePlayerStateServerRpc(G2_PlayerState.Die);
                 //ExitServerRpc(OwnerClientId);
-                
+
                 Invoke(nameof(OnInitServerRpc), 4);
                 return;
             }
@@ -314,7 +314,7 @@ namespace SkeletonEditor
         {
             networkSpeed.Value = speed;
         }
-        public void LevelUp(int val=1)
+        public void LevelUp(int val = 1)
         {
             if (oldPlayerState == G2_PlayerState.Die)
             {
@@ -334,19 +334,25 @@ namespace SkeletonEditor
             isCheckHit = true;
             Debug.Log("hit");
             RaycastHit hit;
-            SkillEffectServerRpc(transform.position + Vector3.up * heightUpAttack + transform.forward*2);
-            int layerMask = LayerMask.GetMask("Player");
+            SkillEffectServerRpc(transform.position + Vector3.up * heightUpAttack + transform.forward * 2);
 
-            if (Physics.SphereCast(transform.position + Vector3.up * heightUpAttack,1f, transform.forward, out hit, attackRange, layerMask))
+            if (Physics.SphereCast(transform.position + Vector3.up * heightUpAttack, 1f, transform.forward, out hit, attackRange))
             {
                 Debug.DrawRay(transform.position + Vector3.up * heightUpAttack, transform.forward * attackRange, Color.yellow);
-
-                var playerHit = hit.transform.GetComponent<NetworkObject>();
-                if (playerHit != null)
+                if (hit.collider.CompareTag("Player"))
                 {
-                    UpdateHealthServerRpc(damage, playerHit.OwnerClientId,OwnerClientId);
-                    SpawnAttackServerRpc(hit.transform.position + Vector3.up * heightUpAttack);
-                    Debug.Log("Attack a enemy");
+                    var playerHit = hit.transform.GetComponent<NetworkObject>();
+                    if (playerHit != null)
+                    {
+                        UpdateHealthServerRpc(damage, playerHit.OwnerClientId, OwnerClientId);
+                        SpawnAttackServerRpc(hit.transform.position + Vector3.up * heightUpAttack);
+                        Debug.Log("Attack a enemy");
+                    }
+                }
+                if (hit.collider.CompareTag("Monster"))
+                {
+                    var bot = hit.transform.GetComponent<G2_Bot>();
+                    KillMonsterServerRpc(bot.ID.Value);
                 }
             }
             else
@@ -354,6 +360,16 @@ namespace SkeletonEditor
                 Debug.DrawRay(transform.position + Vector3.up * heightUpAttack, transform.forward * attackRange, Color.red);
             }
         }
+        [ServerRpc]
+        void KillMonsterServerRpc(int botID)
+        {
+            Debug.Log(botID);
+
+            G2_Bot bot = SpawnerController.Instance.GetMonster(botID);
+            bot.networkDeath.Value = true;
+            LevelUp();
+        }
+      
         [ServerRpc]
         public void SkillEffectServerRpc(Vector3 pos)
         {

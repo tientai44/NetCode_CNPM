@@ -5,9 +5,12 @@ using Unity.Netcode;
 using Unity.VisualScripting;
 using UnityEngine;
 using UnityEngine.AI;
+using UnityEngine.UIElements;
 
 public class G2_Bot : NetworkBehaviour
 {
+    public NetworkVariable<int> ID;
+    public NetworkVariable<bool> networkDeath = new NetworkVariable<bool>(false);
     [SerializeField] Animator animator;
     [SerializeField] G2_IState currentState;
     [SerializeField] G2_PlayerController target;
@@ -23,6 +26,13 @@ public class G2_Bot : NetworkBehaviour
     }
     public void Update()
     {
+        if(networkDeath.Value == true)
+        {
+            if (currentState is not G2_DieState)
+            {
+                ChangeState(new G2_DieState());
+            }
+        }
         if(currentState != null)
         {
             currentState.OnExecute(this);
@@ -59,6 +69,10 @@ public class G2_Bot : NetworkBehaviour
             {
                 navMeshAgent.destination = target.transform.position;
             }
+            if (Vector3.Distance(target.transform.position, transform.position) < 3f)
+            {
+                ChangeState(new G2_AttackState());
+            }
         }
         else
         {
@@ -69,9 +83,9 @@ public class G2_Bot : NetworkBehaviour
     {
         if (playerArounds.Count > 0)
         {
-            target = playerArounds[Random.Range(0, playerArounds.Count)];
+            if(target==null)
+                target = playerArounds[Random.Range(0, playerArounds.Count)];
             ChangeState(new G2_PatrolState());
-
         }
     }
     public void StopMoving()
@@ -87,8 +101,30 @@ public class G2_Bot : NetworkBehaviour
         currentState = newState;
         currentState.OnEnter(this);
     }
+    public void Attack()
+    {
+        ChangeAnim("attack");
+        StartCoroutine(IEAttack());
+    }
+    IEnumerator IEAttack()
+    {
+        yield return new WaitForSeconds(1);
+        if (target != null)
+        {
+            if (Vector3.Distance(target.transform.position, transform.position) < 1f)
+            {
+                target.IncreaseHealth(-100);
+            }
+        }
+    }
     public void ChangeAnim(string animName)
     {
         animator.Play(animName);
+    }
+    public void OnDeath()
+    {
+        StopMoving();
+        ChangeAnim("die");
+        GetComponent<Collider>().enabled = false;
     }
 }

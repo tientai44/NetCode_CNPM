@@ -16,7 +16,8 @@ public class SpawnerController : NetworkBehaviour
     private GameObject monsterPrefab;
     [SerializeField]
     private int maxObjectInstanceCount = 10;
-
+    [SerializeField]
+    List<G2_Bot> bots= new List<G2_Bot>();
 
     private void Awake()
     {
@@ -50,26 +51,29 @@ public class SpawnerController : NetworkBehaviour
     public void SpawnMonsters()
     {
         if (!IsServer) return;
-
-
-
-
         NetworkObject networkObject = NetworkObjectPool.Singleton.GetNetworkObject(monsterPrefab, new Vector3(Random.Range(-10, 10),0, Random.Range(-10, 10)), Quaternion.identity);
         networkObject.Spawn(true);
+        G2_Bot bot = networkObject.GetComponent<G2_Bot>();
+        if (!bots.Contains(bot))
+        {
+            bot.ID.Value = bots.Count;
+            bots.Add(bot);
+        }
 
+    }
+    public G2_Bot GetMonster(int id)
+    {
+        return bots[id];
     }
     public void GetBackObject(NetworkObject networkObject)
     {
         if (!IsServer) return;
         NetworkObjectPool.Singleton.ReturnNetworkObject(networkObject, objectPrefab);
         networkObject.Despawn(false);
-
-
     }
     public void SpawnAttackHitEffect(Vector3 pos)
     {
         if (!IsServer) return;
-
         NetworkObject networkObject = NetworkObjectPool.Singleton.GetNetworkObject(effectAttack, pos, Quaternion.identity);
         networkObject.Spawn(true);
         networkObject.GetComponent<ParticleSystem>().Play();
