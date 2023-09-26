@@ -56,6 +56,13 @@ public class G2_Bot : NetworkBehaviour
         {
             target = null;
         }
+        for(int i = 0; i < playerArounds.Count; i++)
+        {
+            if (playerArounds[i] == null)
+            {
+                playerArounds.RemoveAt(i);
+            }
+        }
         if (target == null)
         {
             if (playerArounds.Count > 0)
@@ -111,7 +118,7 @@ public class G2_Bot : NetworkBehaviour
         yield return new WaitForSeconds(1);
         if (target != null)
         {
-            if (Vector3.Distance(target.transform.position, transform.position) < 1f)
+            if (Vector3.Distance(target.transform.position, transform.position) < 5f)
             {
                 target.IncreaseHealth(-100);
             }

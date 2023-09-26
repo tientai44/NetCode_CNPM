@@ -61,6 +61,13 @@ public class SpawnerController : NetworkBehaviour
         }
 
     }
+    public void ReturnMonster(NetworkObject networkObject)
+    {
+        if (!IsServer) return;
+        NetworkObjectPool.Singleton.ReturnNetworkObject(networkObject, monsterPrefab);
+        networkObject.Despawn(false);
+
+    }
     public G2_Bot GetMonster(int id)
     {
         return bots[id];
