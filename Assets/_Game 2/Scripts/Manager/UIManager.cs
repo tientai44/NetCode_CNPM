@@ -13,8 +13,9 @@ public class UIManager : MonoBehaviour
     [SerializeField] Button executePhysicsButton;
     [SerializeField] Button spawnMonsterButton;
     [SerializeField] TextMeshProUGUI playersInGameTxt;
+    [SerializeField] TMP_InputField inputField;
     private bool hasServerStarted;
-
+    private static int maxConn = 10;
     private void Awake()
     {
         Cursor.visible = true;
@@ -36,8 +37,11 @@ public class UIManager : MonoBehaviour
     {
         playersInGameTxt.text = $"Players In Game: {PlayersManager.Instance.PlayersInGame}";
     }
-    void OnClickStartHostBtn()
+    async void OnClickStartHostBtn()
     {
+        if (RelayManager.Instance.IsRelayEnabled)
+            await RelayManager.Instance.HostGame(maxConn);
+        else return;
         if (NetworkManager.Singleton.StartHost())
         {
             LoggerDebug.Instance.LogInfo("Host started...");
@@ -49,6 +53,7 @@ public class UIManager : MonoBehaviour
     }
     void OnClickStartServerBtn()
     {
+        
         if (NetworkManager.Singleton.StartServer())
         {
             LoggerDebug.Instance.LogInfo("Server started...");
@@ -58,8 +63,11 @@ public class UIManager : MonoBehaviour
             LoggerDebug.Instance.LogInfo("Server could not be started...");
         }
     }
-    void OnClickStartClientBtn()
+    async void OnClickStartClientBtn()
     {
+        if (RelayManager.Instance.IsRelayEnabled && !string.IsNullOrEmpty(inputField.text))
+            await RelayManager.Instance.JoinGame(inputField.text);
+        else return;
         if (NetworkManager.Singleton.StartClient())
         {
             LoggerDebug.Instance.LogInfo("Client started...");
