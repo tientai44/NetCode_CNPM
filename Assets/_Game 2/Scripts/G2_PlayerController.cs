@@ -143,7 +143,7 @@ namespace SkeletonEditor
         }
         private void ClientMoveAndRotate()
         {
-            if (networkPositionDirection.Value != Vector3.zero)
+            //if (networkPositionDirection.Value != Vector3.zero)
             {
                 //characterController.SimpleMove(networkPositionDirection.Value);
                rgbody.velocity = networkPositionDirection.Value;

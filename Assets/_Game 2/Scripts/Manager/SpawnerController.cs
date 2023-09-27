@@ -2,6 +2,7 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using Unity.Netcode;
+using Unity.VisualScripting;
 using UnityEngine;
 using Random = UnityEngine.Random;
 
@@ -18,13 +19,40 @@ public class SpawnerController : NetworkBehaviour
     private int maxObjectInstanceCount = 10;
     [SerializeField]
     List<G2_Bot> bots= new List<G2_Bot>();
-
+    int numMonster=0;
+    private static float timeDuration = 15;
     private void Awake()
     {
         Instance = this;
-
+       
+        
     }
- 
+    
+    void Start()
+    {
+        NetworkManager.OnServerStarted += () =>
+        {
+            StartCoroutine(IESpawnMonster());
+            StartCoroutine(IESpawnBootster());
+        };
+    }
+    IEnumerator IESpawnMonster()
+    {
+        yield return new WaitForSeconds(timeDuration);
+
+        if (numMonster < 5)
+        {
+            SpawnMonsters();
+        }
+
+        StartCoroutine(IESpawnMonster());
+    }
+    IEnumerator IESpawnBootster()
+    {
+        yield return new WaitForSeconds(timeDuration*4);
+        SpawnObjects();
+        StartCoroutine(IESpawnBootster());
+    }
     public void SpawnObjects()
     {
         if (!IsServer) return;
@@ -35,7 +63,7 @@ public class SpawnerController : NetworkBehaviour
             //    new Vector3(Random.Range(-10, 10), 10.0f, Random.Range(-10, 10)), Quaternion.identity);
             List<G2_BoosterType> lst = new List<G2_BoosterType> { G2_BoosterType.BuffHp, G2_BoosterType.BuffDame, G2_BoosterType.LevelUp, G2_BoosterType.SpeedUp };
 
-            NetworkObject networkObject = NetworkObjectPool.Singleton.GetNetworkObject(objectPrefab, new Vector3(Random.Range(-100, 100), 10.0f, Random.Range(-100, 100)), Quaternion.identity);
+            NetworkObject networkObject = NetworkObjectPool.Singleton.GetNetworkObject(objectPrefab, new Vector3(Random.Range(-20, 20), 10.0f, Random.Range(-20, 20)), Quaternion.identity);
             networkObject.Spawn(true);
             networkObject.GetComponent<G2_Booster>().SetType(lst[Random.Range(0, lst.Count)]);
 
@@ -53,6 +81,7 @@ public class SpawnerController : NetworkBehaviour
             bot.ID.Value = bots.Count;
             bots.Add(bot);
         }
+        numMonster += 1;
 
     }
     public void ReturnMonster(NetworkObject networkObject)
@@ -60,7 +89,7 @@ public class SpawnerController : NetworkBehaviour
         if (!IsServer) return;
         NetworkObjectPool.Singleton.ReturnNetworkObject(networkObject, monsterPrefab);
         networkObject.Despawn(false);
-
+        numMonster -= 1;
     }
     public G2_Bot GetMonster(int id)
     {

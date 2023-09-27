@@ -16,6 +16,7 @@ public class G2_Bot : NetworkBehaviour
     [SerializeField] G2_PlayerController target;
     [SerializeField] NavMeshAgent navMeshAgent;
     [SerializeField] List<G2_PlayerController> playerArounds= new List<G2_PlayerController>();
+    [SerializeField] ParticleSystem effectSummon;
     Collider _collider;
     private void Awake()
     {
@@ -25,10 +26,11 @@ public class G2_Bot : NetworkBehaviour
 
     public void OnInit()
     {
+        playerArounds.Clear();
         ChangeState(new G2_PatrolState());
         _collider.enabled = true;
         networkDeath.Value = false;
-
+        effectSummon.Play();
     }
     public void Update()
     {

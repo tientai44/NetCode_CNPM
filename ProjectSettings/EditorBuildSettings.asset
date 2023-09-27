@@ -21,9 +21,9 @@ EditorBuildSettings:
     path: 
     guid: 00000000000000000000000000000000
   - enabled: 0
-    path: Assets/_Game 1/_Game 2/Scenes/Game 2_Demo.unity
+    path: Assets/_Game 2/Scenes/Game 2_Demo.unity
     guid: 6f621b0460585cf46950a1e8a245ce7d
   - enabled: 1
-    path: Assets/_Game 1/_Game 2/Scenes/Game 2.unity
+    path: Assets/_Game 2/Scenes/Game 2.unity
     guid: 8725577748e535b4aa843103bdb6c807
   m_configObjects: {}
