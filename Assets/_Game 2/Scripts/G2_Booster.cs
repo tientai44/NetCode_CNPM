@@ -15,7 +15,8 @@ public class G2_Booster : NetworkBehaviour
 {
     private G2_BoosterType type;
 
-    public void SetType(G2_BoosterType _type)
+    [ClientRpc]
+    public void SetTypeClientRpc(G2_BoosterType _type)
     {
         type = _type;
         switch (_type)

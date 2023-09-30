@@ -46,6 +46,7 @@ public class UIManager : MonoBehaviour
     {
         if (RelayManager.Instance.IsRelayEnabled)
             await RelayManager.Instance.HostGame(maxConn);
+        else return;
         if (NetworkManager.Singleton.StartHost())
         {
             LoggerDebug.Instance.LogInfo("Host started...");
@@ -72,6 +73,7 @@ public class UIManager : MonoBehaviour
     {
         if (RelayManager.Instance.IsRelayEnabled && !string.IsNullOrEmpty(inputField.text))
             await RelayManager.Instance.JoinGame(inputField.text);
+        else return;
         if (NetworkManager.Singleton.StartClient())
         {
             LoggerDebug.Instance.LogInfo("Client started...");

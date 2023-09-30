@@ -85,6 +85,9 @@ namespace SkeletonEditor
         [SerializeField] private ParticleSystem buffSpeedEffect;
         Coroutine coroutineAttack;
         Coroutine coroutineCheckHit;
+
+        public G2_PlayerState OldPlayerState { get => oldPlayerState; }
+
         private void Awake()
         {
             characterController = GetComponent<CharacterController>();
@@ -143,15 +146,16 @@ namespace SkeletonEditor
         }
         private void ClientMoveAndRotate()
         {
-            //if (networkPositionDirection.Value != Vector3.zero)
-            {
-                //characterController.SimpleMove(networkPositionDirection.Value);
-               rgbody.velocity = networkPositionDirection.Value;
-            }
             if (networkRotationDirection.Value != Vector3.zero)
             {
                 transform.Rotate(networkRotationDirection.Value, Space.World);
             }
+            //if (networkPositionDirection.Value != Vector3.zero)
+            {
+                //characterController.SimpleMove(networkPositionDirection.Value);
+                rgbody.velocity = networkPositionDirection.Value;
+            }
+            
         }
 
         private void ClientVisuals()
@@ -391,10 +395,7 @@ namespace SkeletonEditor
             NetworkObjectPool.Singleton.ReturnNetworkObject(networkObject, skillEffect);
             networkObject.Despawn(false);
         }
-        public void EatBooster(float takeAwayPoint)
-        {
-            networkPlayerHealth.Value += takeAwayPoint;
-        }
+
         public void IncreaseHealth(float takeAwayPoint)
         {
             if (oldPlayerState == G2_PlayerState.Die)

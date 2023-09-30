@@ -11,6 +11,8 @@ public class G2_Bot : NetworkBehaviour
 {
     public NetworkVariable<int> ID;
     public NetworkVariable<bool> networkDeath = new NetworkVariable<bool>(false);
+    private bool isDeath = false;
+
     [SerializeField] Animator animator;
     [SerializeField] G2_IState currentState;
     [SerializeField] G2_PlayerController target;
@@ -27,23 +29,50 @@ public class G2_Bot : NetworkBehaviour
     public void OnInit()
     {
         playerArounds.Clear();
-        ChangeState(new G2_PatrolState());
+        ChangeState(new G2_IdleState());
         _collider.enabled = true;
-        networkDeath.Value = false;
         effectSummon.Play();
+        Collider[] targets = Physics.OverlapSphere(transform.position, 10f,LayerMask.GetMask("Player"));
+        for(int i = 0; i < targets.Length; i++)
+        {
+            AddTarget(targets[i].GetComponent<G2_PlayerController>());
+        }
     }
     public void Update()
     {
-        if(networkDeath.Value == true)
+        CheckAlive();
+        if (IsOwner)
+        {
+            UpdateClientRpc();
+        }
+    }
+    [ClientRpc]
+    public void UpdateClientRpc()
+    {
+        if (currentState != null)
+        {
+            currentState.OnExecute(this);
+        }
+    }
+    public void CheckAlive()
+    {
+        if(isDeath != networkDeath.Value)
+        {
+            isDeath = networkDeath.Value;
+        }
+        if (isDeath == true)
         {
             if (currentState is not G2_DieState)
             {
                 ChangeState(new G2_DieState());
             }
         }
-        if(currentState != null)
+        else
         {
-            currentState.OnExecute(this);
+            if (currentState is G2_DieState || currentState == null)
+            {
+                OnInit();
+            }
         }
     }
     public void AddTarget(G2_PlayerController player)
@@ -78,8 +107,14 @@ public class G2_Bot : NetworkBehaviour
                 target = playerArounds[Random.Range(0, playerArounds.Count)];
             }
         }
+       
         if(target != null)
         {
+            if (target.OldPlayerState == G2_PlayerState.Die)
+            {
+                target = null;
+                return;
+            }
             if (Vector3.Distance(navMeshAgent.destination, target.transform.position)>0.1f)
             {
                 navMeshAgent.destination = target.transform.position;
@@ -124,7 +159,7 @@ public class G2_Bot : NetworkBehaviour
     IEnumerator IEAttack()
     {
         yield return new WaitForSeconds(1);
-        if (target != null)
+        if (target != null && currentState is not G2_DieState)
         {
             if (Vector3.Distance(target.transform.position, transform.position) < 5f)
             {

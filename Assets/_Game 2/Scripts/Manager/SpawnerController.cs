@@ -65,7 +65,7 @@ public class SpawnerController : NetworkBehaviour
 
             NetworkObject networkObject = NetworkObjectPool.Singleton.GetNetworkObject(objectPrefab, new Vector3(Random.Range(-20, 20), 10.0f, Random.Range(-20, 20)), Quaternion.identity);
             networkObject.Spawn(true);
-            networkObject.GetComponent<G2_Booster>().SetType(lst[Random.Range(0, lst.Count)]);
+            networkObject.GetComponent<G2_Booster>().SetTypeClientRpc(lst[Random.Range(0, lst.Count)]);
 
         }
     }
@@ -75,7 +75,7 @@ public class SpawnerController : NetworkBehaviour
         NetworkObject networkObject = NetworkObjectPool.Singleton.GetNetworkObject(monsterPrefab, new Vector3(Random.Range(-10, 10),0, Random.Range(-10, 10)), Quaternion.identity);
         networkObject.Spawn(true);
         G2_Bot bot = networkObject.GetComponent<G2_Bot>();
-        bot.OnInit();
+        bot.networkDeath.Value=false;
         if (!bots.Contains(bot))
         {
             bot.ID.Value = bots.Count;
