@@ -50,6 +50,8 @@ public class UIManager : MonoBehaviour
         if (NetworkManager.Singleton.StartHost())
         {
             LoggerDebug.Instance.LogInfo("Host started...");
+            UI_MainMenu.SetActive(false);
+
         }
         else
         {
@@ -77,6 +79,7 @@ public class UIManager : MonoBehaviour
         if (NetworkManager.Singleton.StartClient())
         {
             LoggerDebug.Instance.LogInfo("Client started...");
+            UI_MainMenu.SetActive(false);
         }
         else
         {
