@@ -158,6 +158,10 @@ public class G2_Bot : NetworkBehaviour
     }
     IEnumerator IEAttack()
     {
+        if (!IsServer)
+        {
+            yield break;
+        }
         yield return new WaitForSeconds(1);
         if (target != null && currentState is not G2_DieState)
         {

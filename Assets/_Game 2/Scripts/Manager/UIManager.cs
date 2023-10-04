@@ -17,6 +17,8 @@ public class UIManager : MonoBehaviour
     [SerializeField] TMP_InputField inputField;
     [SerializeField] GameObject UI_GamePlay;
     [SerializeField] GameObject UI_MainMenu;
+    [SerializeField] GameObject UI_Loading;
+    [SerializeField] UINotify UI_Notify;
     public TextMeshProUGUI RoomText;
     private bool hasServerStarted;
     private static int maxConn = 10;
@@ -40,24 +42,40 @@ public class UIManager : MonoBehaviour
     }
     private void Update()
     {
-        playersInGameTxt.text = $"Players In Game: {PlayersManager.Instance.PlayersInGame}";
+        playersInGameTxt.text = $"Players In Game: {PlayersManager.Instance.PlayersInGame}/{ maxConn}";
+
+
+
     }
     async void OnClickStartHostBtn()
     {
+        if (hasServerStarted)
+        {
+            return;
+        }
+
         if (RelayManager.Instance.IsRelayEnabled)
+        {
+            UI_Loading.SetActive(true);
             await RelayManager.Instance.HostGame(maxConn);
-        else return;
+        }
+        else {
+            Notify("Relay Is Not Ready");
+            return; 
+        }
+
         if (NetworkManager.Singleton.StartHost())
         {
             LoggerDebug.Instance.LogInfo("Host started...");
             UI_MainMenu.SetActive(false);
-
         }
         else
         {
+            Notify("Host could not be started...");
+
             LoggerDebug.Instance.LogInfo("Host could not be started...");
         }
-
+        UI_Loading.SetActive(false);
     }
     void OnClickStartServerBtn()
     {
@@ -74,8 +92,24 @@ public class UIManager : MonoBehaviour
     async void OnClickStartClientBtn()
     {
         if (RelayManager.Instance.IsRelayEnabled && !string.IsNullOrEmpty(inputField.text))
-            await RelayManager.Instance.JoinGame(inputField.text);
-        else return;
+        {
+            UI_Loading.SetActive(true);
+            try
+            {
+                await RelayManager.Instance.JoinGame(inputField.text);
+            }
+            catch
+            {
+                Notify("Room not exist");
+                UI_Loading.SetActive(false);
+                return;
+            }
+        }
+        else
+        {
+            Notify("Enter the Room ID");
+            return;
+        }
         if (NetworkManager.Singleton.StartClient())
         {
             LoggerDebug.Instance.LogInfo("Client started...");
@@ -85,7 +119,7 @@ public class UIManager : MonoBehaviour
         {
             LoggerDebug.Instance.LogInfo("Client could not be started...");
         }
-
+        UI_Loading.SetActive(false);
 
     }
     void OnClickExecutePhysics()
@@ -105,5 +139,9 @@ public class UIManager : MonoBehaviour
             return;
         }
         SpawnerController.Instance.SpawnMonsters();
+    }
+    public void Notify(string message)
+    {
+        UI_Notify.Notify(message);
     }
 }

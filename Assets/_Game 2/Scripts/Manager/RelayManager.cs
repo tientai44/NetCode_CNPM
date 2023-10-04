@@ -88,8 +88,10 @@ public class RelayManager : MonoBehaviour
         }
 
         //Ask Unity Services for allocation data based on a join code
+   
         JoinAllocation allocation = await Unity.Services.Relay.RelayService.Instance.JoinAllocationAsync(joinCode);
-
+        
+       
         //Populate the joining data
         RelayJoinData data = new RelayJoinData
         {
