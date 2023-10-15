@@ -97,6 +97,7 @@ namespace SkeletonEditor
         [ServerRpc]
         void OnInitServerRpc()
         {
+            ChangeState(G2_PlayerState.Idle);
             UpdatePlayerStateServerRpc(G2_PlayerState.Idle);
             networkLevel.Value = 1;
             networkMaxPlayerHealth.Value = G2_StaticData.INTIAL_HEALTH;
@@ -123,15 +124,15 @@ namespace SkeletonEditor
             {
                 ClientInput();
             }
-            ClientMoveAndRotate();
+            //ClientMoveAndRotate();
             ClientVisuals();
-            //CheckAlive();
+            CheckAlive();
         }
         private void FixedUpdate()
         {
             if (IsClient && IsOwner)
             {
-                switch (networkPlayerState.Value)
+                switch (oldPlayerState)
                 {
                     case G2_PlayerState.Attack:
                         CheckHit();
@@ -153,35 +154,36 @@ namespace SkeletonEditor
             //if (networkPositionDirection.Value != Vector3.zero)
             {
                 //characterController.SimpleMove(networkPositionDirection.Value);
-                rgbody.velocity = networkPositionDirection.Value;
+                //rgbody.velocity = networkPositionDirection.Value;
             }
-            
+
         }
 
         private void ClientVisuals()
         {
 
-            if (oldPlayerState != networkPlayerState.Value)
-            {
+            //if (oldPlayerState != networkPlayerState.Value)
+            //{
 
-                oldPlayerState = networkPlayerState.Value;
-                animator.Play(networkPlayerState.Value.ToString());
+            //    oldPlayerState = networkPlayerState.Value;
+            //    animator.Play(networkPlayerState.Value.ToString());
 
-                switch (oldPlayerState)
-                {
-                    case G2_PlayerState.Die:
-                        DOVirtual.DelayedCall(1f, () =>
-                        {
-                            dieEffect.gameObject.SetActive(true);
-                            dieEffect.Play();
-                        });
-                        break;
-                    default:
-                        dieEffect.gameObject.SetActive(false);
-                        break;
-                }
+            //    switch (oldPlayerState)
+            //    {
+            //        case G2_PlayerState.Die:
+            //            DOVirtual.DelayedCall(1f, () =>
+            //            {
+            //                dieEffect.gameObject.SetActive(true);
+            //                dieEffect.Play();
+            //            });
+            //            break;
+            //        default:
+            //            dieEffect.gameObject.SetActive(false);
+            //            break;
+            //    }
 
-            }
+            //}
+
             if (oldPlayerHealth != networkPlayerHealth.Value || oldMaxPlayerHealth != networkMaxPlayerHealth.Value)
             {
                 if (oldPlayerHealth < networkPlayerHealth.Value)
@@ -224,10 +226,30 @@ namespace SkeletonEditor
         {
             if (networkPlayerHealth.Value <= 0)
             {
-                UpdatePlayerStateServerRpc(G2_PlayerState.Die);
+                if (!dieEffect.gameObject.activeSelf)
+                {
+                    DOVirtual.DelayedCall(1f, () =>
+                            {
+                                dieEffect.gameObject.SetActive(true);
+                                dieEffect.Play();
+                            });
+                }
 
             }
+            else
+            {
+                dieEffect.gameObject.SetActive(false);
+            }
 
+        }
+        public void ChangeState(G2_PlayerState state)
+        {
+            if (oldPlayerState != state)
+            {
+                oldPlayerState = state;
+                animator.Play(state.ToString());
+
+            }
         }
         private void ClientInput()
         {
@@ -249,42 +271,61 @@ namespace SkeletonEditor
             // change animation states
             if (networkPlayerHealth.Value <= 0)
             {
-                UpdatePlayerStateServerRpc(G2_PlayerState.Die);
+                //UpdatePlayerStateServerRpc(G2_PlayerState.Die);
                 //ExitServerRpc(OwnerClientId);
-
+                ChangeState(G2_PlayerState.Die);
                 Invoke(nameof(OnInitServerRpc), 4);
                 return;
             }
             if (ActivePunchActionKey() && forwardInput == 0 && !isAttacking && oldPlayerState != G2_PlayerState.Attack)
             {
-                UpdatePlayerStateServerRpc(G2_PlayerState.Attack);
+                //UpdatePlayerStateServerRpc(G2_PlayerState.Attack);
+                ChangeState(G2_PlayerState.Attack);
                 isAttacking = true;
                 Invoke(nameof(ResetAttack), 2f);
                 Invoke(nameof(SetCheckHit), timeDelayCheckHit);
                 return;
             }
             if (forwardInput == 0 && !isAttacking)
-                UpdatePlayerStateServerRpc(G2_PlayerState.Idle);
+            {
+                //UpdatePlayerStateServerRpc(G2_PlayerState.Idle);
+                ChangeState(G2_PlayerState.Idle);
+            }
             else if (!ActiveRunningActionKey() && forwardInput > 0 && forwardInput <= 1)
-                UpdatePlayerStateServerRpc(G2_PlayerState.Walk);
+            {
+                //UpdatePlayerStateServerRpc(G2_PlayerState.Walk);
+                ChangeState(G2_PlayerState.Walk);
+            }
             else if (ActiveRunningActionKey() && forwardInput > 0 && forwardInput <= 1)
             {
                 inputPosition = direction * runSpeedOffset;
-                UpdatePlayerStateServerRpc(G2_PlayerState.Run);
+                //UpdatePlayerStateServerRpc(G2_PlayerState.Run);
+                ChangeState(G2_PlayerState.Run);
             }
             else if (forwardInput < 0)
-                UpdatePlayerStateServerRpc(G2_PlayerState.ReverseWalk);
+            {
+                //UpdatePlayerStateServerRpc(G2_PlayerState.ReverseWalk);
+                ChangeState(G2_PlayerState.ReverseWalk);
+            }
 
             // let server know about position and rotation client changes
-            if (oldInputPosition != inputPosition ||
-                oldInputRotation != inputRotation)
+            //if (oldInputPosition != inputPosition ||
+            //    oldInputRotation != inputRotation)
+            //{
+            //    CancelInvoke(nameof(SetCheckHit));
+            //    CancelInvoke(nameof(ResetAttack));
+            //    isAttacking = false;
+            //    oldInputPosition = inputPosition;
+            //    oldInputRotation = inputRotation;
+            //    UpdateClientPositionAndRotationServerRpc(inputPosition * walkSpeed, inputRotation * rotationSpeed);
+            //}
+            if (inputPosition != Vector3.zero || inputRotation != Vector3.zero)
             {
                 CancelInvoke(nameof(SetCheckHit));
                 CancelInvoke(nameof(ResetAttack));
                 isAttacking = false;
-                oldInputPosition = inputPosition;
-                oldInputRotation = inputRotation;
-                UpdateClientPositionAndRotationServerRpc(inputPosition * walkSpeed, inputRotation * rotationSpeed);
+                transform.Rotate(inputRotation, Space.World);
+                transform.position = Vector3.Lerp(transform.position, transform.position + inputPosition, Time.deltaTime * walkSpeed);
             }
         }
         private static bool ActivePunchActionKey()
@@ -375,13 +416,13 @@ namespace SkeletonEditor
             bot.networkDeath.Value = true;
             LevelUp();
         }
-      
+
         [ServerRpc]
         public void SkillEffectServerRpc(Vector3 pos)
         {
             NetworkObject networkObject = NetworkObjectPool.Singleton.GetNetworkObject(skillEffect, pos, transform.rotation);
             networkObject.Spawn(true);
-            StartCoroutine(ReturnSkillEffect(1f,networkObject));
+            StartCoroutine(ReturnSkillEffect(1f, networkObject));
         }
         [ServerRpc]
         public void SpawnAttackServerRpc(Vector3 pos)
@@ -389,7 +430,7 @@ namespace SkeletonEditor
             SpawnerController.Instance.SpawnAttackHitEffect(pos);
 
         }
-        IEnumerator ReturnSkillEffect(float time,NetworkObject networkObject)
+        IEnumerator ReturnSkillEffect(float time, NetworkObject networkObject)
         {
             yield return new WaitForSeconds(time);
             NetworkObjectPool.Singleton.ReturnNetworkObject(networkObject, skillEffect);
@@ -422,7 +463,7 @@ namespace SkeletonEditor
             networkSpeed.Value += takeAwayPoint;
         }
         [ServerRpc]
-        public void UpdateHealthServerRpc(float takeAwayPoint, ulong clientId,ulong attackerId)
+        public void UpdateHealthServerRpc(float takeAwayPoint, ulong clientId, ulong attackerId)
         {
             var clientWithDamaged = NetworkManager.Singleton.ConnectedClients[clientId]
                 .PlayerObject.GetComponent<G2_PlayerController>();
@@ -430,7 +471,7 @@ namespace SkeletonEditor
             if (clientWithDamaged != null && clientWithDamaged.networkPlayerHealth.Value > 0)
             {
                 clientWithDamaged.networkPlayerHealth.Value -= takeAwayPoint;
-                if(clientWithDamaged.networkPlayerHealth.Value <= 0)
+                if (clientWithDamaged.networkPlayerHealth.Value <= 0)
                 {
                     var attacker = NetworkManager.Singleton.ConnectedClients[attackerId]
                 .PlayerObject.GetComponent<G2_PlayerController>();
@@ -439,7 +480,7 @@ namespace SkeletonEditor
             }
 
             // execute method on a client getting punch
-            NotifyHealthChangedClientRpc(takeAwayPoint,attackerId, new ClientRpcParams
+            NotifyHealthChangedClientRpc(takeAwayPoint, attackerId, new ClientRpcParams
             {
                 Send = new ClientRpcSendParams
                 {
@@ -448,7 +489,7 @@ namespace SkeletonEditor
             });
         }
         [ClientRpc]
-        public void NotifyHealthChangedClientRpc(float takeAwayPoint,ulong attackerId, ClientRpcParams clientRpcParams = default)
+        public void NotifyHealthChangedClientRpc(float takeAwayPoint, ulong attackerId, ClientRpcParams clientRpcParams = default)
         {
             if (IsOwner) return;
 
@@ -461,7 +502,7 @@ namespace SkeletonEditor
                 .PlayerObject.GetComponent<G2_PlayerController>();
             client.ExitSever();
         }
-        
+
         public void ExitSever()
         {
             Debug.Log("Exit");
@@ -473,6 +514,6 @@ namespace SkeletonEditor
             PlayersManager.Instance.DisconnectPlayer(GetComponent<NetworkObject>());
 
         }
-        
+
     }
 }
