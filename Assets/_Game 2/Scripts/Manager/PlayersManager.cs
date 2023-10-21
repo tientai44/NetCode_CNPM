@@ -28,6 +28,7 @@ public class PlayersManager : NetworkBehaviour
                 LoggerDebug.Instance.LogInfo($"{id} just connected...");
                 playersInGame.Value++;
             }
+            UIManager.Instance.UIGamePlay.SetPlayerInGame(PlayersInGame);
         };
 
         NetworkManager.Singleton.OnClientDisconnectCallback += (id) =>
@@ -35,10 +36,9 @@ public class PlayersManager : NetworkBehaviour
             if (IsServer)
             {
                 LoggerDebug.Instance.LogInfo($"{id} just disconnected...");
-
                 playersInGame.Value--;
             }
-        
+            UIManager.Instance.UIGamePlay.SetPlayerInGame(PlayersInGame);
         };
     }
     public void DisconnectPlayer(NetworkObject player)
