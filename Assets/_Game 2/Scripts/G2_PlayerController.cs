@@ -110,7 +110,6 @@ public class G2_PlayerController : NetworkBehaviour
     [ServerRpc]
     void OnInitServerRpc()
     {
-        ChangeState(G2_PlayerState.Idle);
         UpdatePlayerStateServerRpc(G2_PlayerState.Idle);
         networkLevel.Value = 1;
         networkMaxPlayerHealth.Value = G2_StaticData.INTIAL_HEALTH;
@@ -295,7 +294,12 @@ public class G2_PlayerController : NetworkBehaviour
             //UpdatePlayerStateServerRpc(G2_PlayerState.Die);
             //ExitServerRpc(OwnerClientId);
             ChangeState(G2_PlayerState.Die);
-            Invoke(nameof(OnInitServerRpc), 4);
+            DOVirtual.DelayedCall(4f, () =>
+            {
+                ChangeState(G2_PlayerState.Idle);
+                OnInitServerRpc();
+            });
+            
             return;
         }
         if (ActivePunchActionKey() && forwardInput == 0 && !isAttacking && oldPlayerState != G2_PlayerState.Attack)
