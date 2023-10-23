@@ -11,6 +11,7 @@ public class UI_MainMenu : BasePopUp
     [SerializeField] Button startSeverButton;
     [SerializeField] Button startClientButton;
     [SerializeField] Button selectCharacterButton;
+    [SerializeField] Button exitRoom;
     [SerializeField] TMP_InputField inputField;
 
     private void Awake()
@@ -19,11 +20,13 @@ public class UI_MainMenu : BasePopUp
         startClientButton.onClick.AddListener(OnClickStartClientBtn);
         startHostButton.onClick.AddListener(OnClickStartHostBtn);
         selectCharacterButton.onClick.AddListener(SelectCharacterButton);
+        exitRoom.onClick.AddListener(FunExitRoom);
     }
     async void OnClickStartHostBtn()
     {
         if (GameManager.Instance.hasServerStarted)
         {
+            UIManager.Instance.Notify("Server Is Started");
             return;
         }
 
@@ -100,5 +103,22 @@ public class UI_MainMenu : BasePopUp
     private void SelectCharacterButton()
     {
         UIManager.Instance.UIChooseModel.Show();
+    }
+
+    private void FunExitRoom()
+    {
+        //if (networkManager.ConnectedClientsList.Count == 0)
+        //{
+        //    networkManager.Shutdown();
+        //    //networkManager.;
+        //    UIManager.Instance.UI_MainMenu.Show();
+        //}
+        //else
+        {
+            NetworkManager.Singleton.Shutdown();
+            //networkManager.;
+            UIManager.Instance.UI_MainMenu.Show();
+        }
+
     }
 }
