@@ -107,18 +107,12 @@ public class UI_MainMenu : BasePopUp
 
     private void FunExitRoom()
     {
-        //if (networkManager.ConnectedClientsList.Count == 0)
-        //{
-        //    networkManager.Shutdown();
-        //    //networkManager.;
-        //    UIManager.Instance.UI_MainMenu.Show();
-        //}
-        //else
+        if (NetworkManager.Singleton.IsHost)
         {
-            NetworkManager.Singleton.Shutdown();
-            //networkManager.;
-            UIManager.Instance.UI_MainMenu.Show();
+            GameManager.Instance.hasServerStarted = false;
         }
 
+        NetworkManager.Singleton.Shutdown();
+        UIManager.Instance.UI_MainMenu.Show();
     }
 }
