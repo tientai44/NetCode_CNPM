@@ -23,10 +23,16 @@ public class GameManager : MonoBehaviour
             hasServerStarted = true;
         };
         NetworkManager.Singleton.OnClientDisconnectCallback += HandleClientDisconnected;
+        NetworkManager.Singleton.OnClientConnectedCallback += HandleClientConnected;
+    }
+    private void HandleClientConnected(ulong clientId)
+    {
+        UIManager.Instance.Notify($"Welcome new players ID : {clientId}", 1f);
+        Debug.Log("Player Connected with client ID: " + clientId);
     }
     private void HandleClientDisconnected(ulong clientId)
     {
-        UIManager.Instance.Notify($"Player disconnected with client ID : {clientId}");
+        UIManager.Instance.Notify($"Player disconnected with client ID : {clientId}", 1f);
         Debug.Log("Player Disconnected with client ID: " + clientId);
         if (!hasServerStarted)
         {
