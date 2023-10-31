@@ -1,4 +1,3 @@
-using SkeletonEditor;
 using System.Collections;
 using System.Collections.Generic;
 using Unity.Netcode;
@@ -40,10 +39,12 @@ public class G2_Booster : NetworkBehaviour
     {
         if (other.CompareTag("Player"))
         {
-            G2_PlayerController player = other.GetComponent<G2_PlayerController>();
-            BuffPlayer(player);
-            SpawnerController.Instance.GetBackObject(NetworkObject);
-
+            if (IsServer)
+            {
+                G2_PlayerController player = other.GetComponent<G2_PlayerController>();
+                BuffPlayer(player);
+                SpawnerController.Instance.GetBackObject(NetworkObject);
+            }
         }
     }
 

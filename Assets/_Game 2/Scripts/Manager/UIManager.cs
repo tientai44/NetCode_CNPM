@@ -8,18 +8,14 @@ using UnityEngine.UI;
 public class UIManager : MonoBehaviour
 {
     public static UIManager Instance;
-    [SerializeField] Button startHostButton;
-    [SerializeField] Button startSeverButton;
-    [SerializeField] Button startClientButton;
+
     [SerializeField] Button executePhysicsButton;
     [SerializeField] Button spawnMonsterButton;
-    [SerializeField] TextMeshProUGUI playersInGameTxt;
-    [SerializeField] TMP_InputField inputField;
-    [SerializeField] GameObject UI_GamePlay;
-    [SerializeField] GameObject UI_MainMenu;
-    public TextMeshProUGUI RoomText;
-    private bool hasServerStarted;
-    private static int maxConn = 10;
+    public UI_MainMenu UI_MainMenu;
+    public UI_Loading UI_Loading;
+    public UI_ChooseModel UIChooseModel;
+    [SerializeField] UINotify UI_Notify;
+    public UIGamePlay UIGamePlay;
     private void Awake()
     {
         Instance = this;
@@ -28,69 +24,16 @@ public class UIManager : MonoBehaviour
 
     private void Start()
     {
-        startSeverButton.onClick.AddListener(OnClickStartServerBtn);
-        startClientButton.onClick.AddListener(OnClickStartClientBtn);
-        startHostButton.onClick.AddListener(OnClickStartHostBtn);
+
         executePhysicsButton.onClick.AddListener(OnClickExecutePhysics);
         spawnMonsterButton.onClick.AddListener(OnClickSpawnMonster);
-        NetworkManager.Singleton.OnServerStarted += () =>
-        {
-            hasServerStarted = true;
-        };
+      
     }
-    private void Update()
-    {
-        playersInGameTxt.text = $"Players In Game: {PlayersManager.Instance.PlayersInGame}";
-    }
-    async void OnClickStartHostBtn()
-    {
-        if (RelayManager.Instance.IsRelayEnabled)
-            await RelayManager.Instance.HostGame(maxConn);
-        else return;
-        if (NetworkManager.Singleton.StartHost())
-        {
-            LoggerDebug.Instance.LogInfo("Host started...");
-            UI_MainMenu.SetActive(false);
 
-        }
-        else
-        {
-            LoggerDebug.Instance.LogInfo("Host could not be started...");
-        }
-
-    }
-    void OnClickStartServerBtn()
-    {
-        
-        if (NetworkManager.Singleton.StartServer())
-        {
-            LoggerDebug.Instance.LogInfo("Server started...");
-        }
-        else
-        {
-            LoggerDebug.Instance.LogInfo("Server could not be started...");
-        }
-    }
-    async void OnClickStartClientBtn()
-    {
-        if (RelayManager.Instance.IsRelayEnabled && !string.IsNullOrEmpty(inputField.text))
-            await RelayManager.Instance.JoinGame(inputField.text);
-        else return;
-        if (NetworkManager.Singleton.StartClient())
-        {
-            LoggerDebug.Instance.LogInfo("Client started...");
-            UI_MainMenu.SetActive(false);
-        }
-        else
-        {
-            LoggerDebug.Instance.LogInfo("Client could not be started...");
-        }
-
-
-    }
+ 
     void OnClickExecutePhysics()
     {
-        if (!hasServerStarted)
+        if (!GameManager.Instance.hasServerStarted)
         {
             LoggerDebug.Instance.LogWarning("Server has not started...");
             return;
@@ -99,11 +42,15 @@ public class UIManager : MonoBehaviour
     }
     void OnClickSpawnMonster()
     {
-        if (!hasServerStarted)
+        if (!GameManager.Instance.hasServerStarted)
         {
             LoggerDebug.Instance.LogWarning("Server has not started...");
             return;
         }
         SpawnerController.Instance.SpawnMonsters();
+    }
+    public void Notify(string message)
+    {
+        UI_Notify.Notify(message);
     }
 }

@@ -70,7 +70,7 @@ public class RelayManager : MonoBehaviour
         data.JoinCode = await Unity.Services.Relay.RelayService.Instance.GetJoinCodeAsync(data.AllocationID);
         Transport.SetRelayServerData(data.IPv4Address, data.Port, data.AllocationIDBytes,
                 data.Key, data.ConnectionData);
-        UIManager.Instance.RoomText.text = data.JoinCode;
+        UIManager.Instance.UIGamePlay.SetRoomText(data.JoinCode);
 
         LoggerDebug.Instance.LogInfo($"Relay Server Generated Join Code: {data.JoinCode}");
         return data;
@@ -88,8 +88,10 @@ public class RelayManager : MonoBehaviour
         }
 
         //Ask Unity Services for allocation data based on a join code
+   
         JoinAllocation allocation = await Unity.Services.Relay.RelayService.Instance.JoinAllocationAsync(joinCode);
-
+        
+       
         //Populate the joining data
         RelayJoinData data = new RelayJoinData
         {
@@ -105,7 +107,7 @@ public class RelayManager : MonoBehaviour
         Transport.SetRelayServerData(data.IPv4Address, data.Port, data.AllocationIDBytes,
             data.Key, data.ConnectionData, data.HostConnectionData);
         LoggerDebug.Instance.LogInfo($"Client Joined Game With Join Code: {joinCode}");
-        UIManager.Instance.RoomText.text = joinCode;
+        UIManager.Instance.UIGamePlay.SetRoomText(joinCode);
         return data;
     }
 }
