@@ -49,8 +49,8 @@ public class UIManager : MonoBehaviour
         }
         SpawnerController.Instance.SpawnMonsters();
     }
-    public void Notify(string message)
+    public void Notify(string message,float timeOut=0)
     {
-        UI_Notify.Notify(message);
+        UI_Notify.Notify(message,timeOut);
     }
 }
