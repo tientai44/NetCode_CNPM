@@ -6,6 +6,7 @@ using UnityEngine;
 public class PlayersManager : NetworkBehaviour
 {
     public static PlayersManager Instance;
+    [SerializeField]
     NetworkVariable<int> playersInGame = new NetworkVariable<int>();
 
     public int PlayersInGame
@@ -14,6 +15,10 @@ public class PlayersManager : NetworkBehaviour
         {
             return playersInGame.Value;
         }
+        set
+        {
+            playersInGame.Value = value;
+        }
     }
     private void Awake()
     {
@@ -21,6 +26,13 @@ public class PlayersManager : NetworkBehaviour
     }
     void Start()
     {
+        NetworkManager.OnServerStarted += () =>
+        {
+            if (IsServer)
+            {
+                playersInGame.Value = 0;
+            }
+        };
         NetworkManager.Singleton.OnClientConnectedCallback += (id) =>
         {
             if (IsServer)
@@ -40,16 +52,5 @@ public class PlayersManager : NetworkBehaviour
             }
             UIManager.Instance.UIGamePlay.SetPlayerInGame(PlayersInGame);
         };
-    }
-    public void DisconnectPlayer(NetworkObject player)
-    {
-        // Note: If a client invokes this method, it will throw an exception.
-        if (IsServer)
-        {
-            NetworkManager.DisconnectClient(player.OwnerClientId);
-            LoggerDebug.Instance.LogInfo($"{player.OwnerClientId} just disconnected...");
-
-            playersInGame.Value--;
-        }
     }
 }

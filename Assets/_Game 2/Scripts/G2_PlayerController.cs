@@ -520,24 +520,6 @@ public class G2_PlayerController : NetworkBehaviour
 
         LoggerDebug.Instance.LogInfo($"Client got punch {takeAwayPoint} by Player {attackerId}");
     }
-    [ServerRpc]
-    public void ExitServerRpc(ulong clientId)
-    {
-        var client = NetworkManager.Singleton.ConnectedClients[clientId]
-            .PlayerObject.GetComponent<G2_PlayerController>();
-        client.ExitSever();
-    }
-
-    public void ExitSever()
-    {
-        Debug.Log("Exit");
-        StartCoroutine(IEExitServer());
-    }
-    public IEnumerator IEExitServer()
-    {
-        yield return new WaitForSeconds(4);
-        PlayersManager.Instance.DisconnectPlayer(GetComponent<NetworkObject>());
-
-    }
+    
 
 }

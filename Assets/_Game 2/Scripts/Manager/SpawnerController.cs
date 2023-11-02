@@ -27,17 +27,21 @@ public class SpawnerController : NetworkBehaviour
        
         
     }
-    
     void Start()
     {
         NetworkManager.OnServerStarted += () =>
         {
+            bots.Clear();
             StartCoroutine(IESpawnMonster());
             StartCoroutine(IESpawnBootster());
         };
     }
     IEnumerator IESpawnMonster()
     {
+        if (!GameManager.Instance.hasServerStarted)
+        {
+            yield return null;
+        }
         yield return new WaitForSeconds(timeDuration);
 
         if (numMonster < 5)
@@ -49,6 +53,10 @@ public class SpawnerController : NetworkBehaviour
     }
     IEnumerator IESpawnBootster()
     {
+        if (!GameManager.Instance.hasServerStarted)
+        {
+            yield return null;
+        }
         yield return new WaitForSeconds(timeDuration*4);
         SpawnObjects();
         StartCoroutine(IESpawnBootster());
