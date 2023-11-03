@@ -16,9 +16,12 @@ public class G2_Bot : NetworkBehaviour
     [SerializeField] G2_IState currentState;
     [SerializeField] G2_PlayerController target;
     [SerializeField] NavMeshAgent navMeshAgent;
-    [SerializeField] List<G2_PlayerController> playerArounds= new List<G2_PlayerController>();
+    [SerializeField] List<G2_PlayerController> playerArounds = new List<G2_PlayerController>();
     [SerializeField] ParticleSystem effectSummon;
     Collider _collider;
+
+    [SerializeField] AudioSource source;
+    [SerializeField] AudioClip clipAttack;
     private void Awake()
     {
         navMeshAgent = GetComponent<NavMeshAgent>();
@@ -31,8 +34,8 @@ public class G2_Bot : NetworkBehaviour
         ChangeState(new G2_IdleState());
         _collider.enabled = true;
         effectSummon.Play();
-        Collider[] targets = Physics.OverlapSphere(transform.position, 10f,LayerMask.GetMask("Player"));
-        for(int i = 0; i < targets.Length; i++)
+        Collider[] targets = Physics.OverlapSphere(transform.position, 10f, LayerMask.GetMask("Player"));
+        for (int i = 0; i < targets.Length; i++)
         {
             AddTarget(targets[i].GetComponent<G2_PlayerController>());
         }
@@ -55,7 +58,7 @@ public class G2_Bot : NetworkBehaviour
     }
     public void CheckAlive()
     {
-        if(isDeath != networkDeath.Value)
+        if (isDeath != networkDeath.Value)
         {
             isDeath = networkDeath.Value;
         }
@@ -92,7 +95,7 @@ public class G2_Bot : NetworkBehaviour
         {
             target = null;
         }
-        for(int i = 0; i < playerArounds.Count; i++)
+        for (int i = 0; i < playerArounds.Count; i++)
         {
             if (playerArounds[i] == null)
             {
@@ -106,15 +109,15 @@ public class G2_Bot : NetworkBehaviour
                 target = playerArounds[Random.Range(0, playerArounds.Count)];
             }
         }
-       
-        if(target != null)
+
+        if (target != null)
         {
             if (target.OldPlayerState == G2_PlayerState.Die)
             {
                 target = null;
                 return;
             }
-            if (Vector3.Distance(navMeshAgent.destination, target.transform.position)>0.1f)
+            if (Vector3.Distance(navMeshAgent.destination, target.transform.position) > 0.1f)
             {
                 navMeshAgent.destination = target.transform.position;
             }
@@ -132,7 +135,7 @@ public class G2_Bot : NetworkBehaviour
     {
         if (playerArounds.Count > 0)
         {
-            if(target==null)
+            if (target == null)
                 target = playerArounds[Random.Range(0, playerArounds.Count)];
             ChangeState(new G2_PatrolState());
         }
@@ -143,7 +146,7 @@ public class G2_Bot : NetworkBehaviour
     }
     public void ChangeState(G2_IState newState)
     {
-        if(currentState != null)
+        if (currentState != null)
         {
             currentState.OnExit(this);
         }
@@ -164,6 +167,8 @@ public class G2_Bot : NetworkBehaviour
         yield return new WaitForSeconds(1);
         if (target != null && currentState is not G2_DieState)
         {
+            source.clip = clipAttack;
+            source.Play();
             if (Vector3.Distance(target.transform.position, transform.position) < 5f)
             {
                 target.IncreaseHealth(-100);
