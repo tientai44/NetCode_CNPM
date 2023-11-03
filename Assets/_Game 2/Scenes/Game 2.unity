@@ -1874,10 +1874,6 @@ PrefabInstance:
       propertyPath: m_Name
       value: UICANVAS
       objectReference: {fileID: 0}
-    - target: {fileID: 5321855670462017112, guid: 17c33fc9f25d10c4ba890be0d640cd3b, type: 3}
-      propertyPath: m_IsActive
-      value: 1
-      objectReference: {fileID: 0}
     - target: {fileID: 5321855671571501321, guid: 17c33fc9f25d10c4ba890be0d640cd3b, type: 3}
       propertyPath: Camera_Model
       value: 
