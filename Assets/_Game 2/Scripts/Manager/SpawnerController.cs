@@ -38,12 +38,11 @@ public class SpawnerController : NetworkBehaviour
     }
     IEnumerator IESpawnMonster()
     {
+        yield return new WaitForSeconds(timeDuration);
         if (!GameManager.Instance.hasServerStarted)
         {
             yield return null;
         }
-        yield return new WaitForSeconds(timeDuration);
-
         if (numMonster < 5)
         {
             SpawnMonsters();
@@ -53,11 +52,11 @@ public class SpawnerController : NetworkBehaviour
     }
     IEnumerator IESpawnBootster()
     {
+        yield return new WaitForSeconds(timeDuration*4);
         if (!GameManager.Instance.hasServerStarted)
         {
             yield return null;
         }
-        yield return new WaitForSeconds(timeDuration*4);
         SpawnObjects();
         StartCoroutine(IESpawnBootster());
     }
