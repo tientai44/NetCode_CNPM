@@ -91,6 +91,11 @@ public class G2_PlayerController : NetworkBehaviour
 
     public G2_PlayerState OldPlayerState { get => oldPlayerState; }
 
+    [SerializeField] AudioSource source;
+    [SerializeField] AudioClip Attack;
+    [SerializeField] AudioClip Die;
+    [SerializeField] AudioClip Onhit;
+
     private void Awake()
     {
         characterController = GetComponent<CharacterController>();
@@ -235,6 +240,24 @@ public class G2_PlayerController : NetworkBehaviour
     {
         if (oldPlayerState != state)
         {
+            switch (state)
+            {
+                case G2_PlayerState.Attack:
+                    source.clip = Attack;
+                    source.Play();
+                    break;
+                case G2_PlayerState.Die:
+                    source.clip = Die;
+                    source.Play();
+                    break;
+                case G2_PlayerState.OnHit:
+                    source.clip = Onhit;
+                    source.Play();
+                    break;
+                default:
+                    break;
+            }
+
             oldPlayerState = state;
             animator.Play(state.ToString());
         }
@@ -436,6 +459,10 @@ public class G2_PlayerController : NetworkBehaviour
         {
             return;
         }
+
+        source.clip = Onhit;
+        source.Play();
+
         networkPlayerHealth.Value += takeAwayPoint;
         networkPlayerHealth.Value = networkPlayerHealth.Value > networkMaxPlayerHealth.Value ? networkMaxPlayerHealth.Value : networkPlayerHealth.Value;
     }
@@ -488,24 +515,6 @@ public class G2_PlayerController : NetworkBehaviour
 
         LoggerDebug.Instance.LogInfo($"Client got punch {takeAwayPoint} by Player {attackerId}");
     }
-    [ServerRpc]
-    public void ExitServerRpc(ulong clientId)
-    {
-        var client = NetworkManager.Singleton.ConnectedClients[clientId]
-            .PlayerObject.GetComponent<G2_PlayerController>();
-        client.ExitSever();
-    }
-
-    public void ExitSever()
-    {
-        Debug.Log("Exit");
-        StartCoroutine(IEExitServer());
-    }
-    public IEnumerator IEExitServer()
-    {
-        yield return new WaitForSeconds(4);
-        PlayersManager.Instance.DisconnectPlayer(GetComponent<NetworkObject>());
-
-    }
+    
 
 }

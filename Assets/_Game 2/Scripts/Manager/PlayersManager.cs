@@ -6,18 +6,31 @@ using UnityEngine;
 public class PlayersManager : NetworkBehaviour
 {
     public static PlayersManager Instance;
+    [SerializeField]
     NetworkVariable<int> playersInGame = new NetworkVariable<int>();
-
+    int currentPlayerInGame;
     public int PlayersInGame
     {
         get
         {
             return playersInGame.Value;
         }
+        set
+        {
+            playersInGame.Value = value;
+        }
     }
     private void Awake()
     {
         Instance = this;
+    }
+    private void Update()
+    {
+        if(currentPlayerInGame != PlayersInGame)
+        {
+            UIManager.Instance.UIGamePlay.SetPlayerInGame(PlayersInGame);
+            currentPlayerInGame = PlayersInGame;
+        }   
     }
     void Start()
     {
@@ -26,7 +39,7 @@ public class PlayersManager : NetworkBehaviour
             if (IsServer)
             {
                 LoggerDebug.Instance.LogInfo($"{id} just connected...");
-                playersInGame.Value++;
+                playersInGame.Value= NetworkManager.Singleton.ConnectedClients.Count;
             }
             UIManager.Instance.UIGamePlay.SetPlayerInGame(PlayersInGame);
         };
@@ -36,20 +49,9 @@ public class PlayersManager : NetworkBehaviour
             if (IsServer)
             {
                 LoggerDebug.Instance.LogInfo($"{id} just disconnected...");
-                playersInGame.Value--;
+                playersInGame.Value-= 1;
             }
             UIManager.Instance.UIGamePlay.SetPlayerInGame(PlayersInGame);
         };
-    }
-    public void DisconnectPlayer(NetworkObject player)
-    {
-        // Note: If a client invokes this method, it will throw an exception.
-        if (IsServer)
-        {
-            NetworkManager.DisconnectClient(player.OwnerClientId);
-            LoggerDebug.Instance.LogInfo($"{player.OwnerClientId} just disconnected...");
-
-            playersInGame.Value--;
-        }
     }
 }
