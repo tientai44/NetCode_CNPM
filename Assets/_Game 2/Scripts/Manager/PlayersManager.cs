@@ -8,7 +8,7 @@ public class PlayersManager : NetworkBehaviour
     public static PlayersManager Instance;
     [SerializeField]
     NetworkVariable<int> playersInGame = new NetworkVariable<int>();
-
+    int currentPlayerInGame;
     public int PlayersInGame
     {
         get
@@ -24,21 +24,22 @@ public class PlayersManager : NetworkBehaviour
     {
         Instance = this;
     }
+    private void Update()
+    {
+        if(currentPlayerInGame != PlayersInGame)
+        {
+            UIManager.Instance.UIGamePlay.SetPlayerInGame(PlayersInGame);
+            currentPlayerInGame = PlayersInGame;
+        }   
+    }
     void Start()
     {
-        NetworkManager.OnServerStarted += () =>
-        {
-            if (IsServer)
-            {
-                playersInGame.Value = 0;
-            }
-        };
         NetworkManager.Singleton.OnClientConnectedCallback += (id) =>
         {
             if (IsServer)
             {
                 LoggerDebug.Instance.LogInfo($"{id} just connected...");
-                playersInGame.Value++;
+                playersInGame.Value= NetworkManager.Singleton.ConnectedClients.Count;
             }
             UIManager.Instance.UIGamePlay.SetPlayerInGame(PlayersInGame);
         };
@@ -48,7 +49,7 @@ public class PlayersManager : NetworkBehaviour
             if (IsServer)
             {
                 LoggerDebug.Instance.LogInfo($"{id} just disconnected...");
-                playersInGame.Value--;
+                playersInGame.Value-= 1;
             }
             UIManager.Instance.UIGamePlay.SetPlayerInGame(PlayersInGame);
         };
