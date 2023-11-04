@@ -1,3 +1,4 @@
+using Sirenix.OdinInspector;
 using System;
 using System.Collections;
 using System.Collections.Generic;
@@ -9,15 +10,15 @@ using Random = UnityEngine.Random;
 public class SpawnerController : NetworkBehaviour
 {
     public static SpawnerController Instance;
-    [SerializeField]
+    [FoldoutGroup("Prefab"),SerializeField]
     private GameObject objectPrefab;
-    [SerializeField]
+    [FoldoutGroup("effect Attack"), SerializeField]
     private GameObject effectAttack;
-    [SerializeField]
+    [FoldoutGroup("monster Prefab"), SerializeField]
     private GameObject monsterPrefab;
-    [SerializeField]
+    [FoldoutGroup("maxObjectInstance"),SerializeField]
     private int maxObjectInstanceCount = 10;
-    [SerializeField]
+    [FoldoutGroup("List Bot"), SerializeField]
     List<G2_Bot> bots= new List<G2_Bot>();
     int numMonster=0;
     private static float timeDuration = 15;

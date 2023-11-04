@@ -1,3 +1,4 @@
+using Sirenix.OdinInspector;
 using System;
 using System.Collections;
 using System.Collections.Generic;
@@ -9,14 +10,14 @@ using UnityEngine.UI;
 
 public class PlayerHud : NetworkBehaviour
 {
-    [SerializeField]
+    [FoldoutGroup("NetworkVariable"), SerializeField]
     private NetworkVariable<NetworkString> playersName = new NetworkVariable<NetworkString>();
 
-    [SerializeField]
+    [FoldoutGroup("UI Component"), SerializeField]
     private G2_PlayerController player;
-    [SerializeField] TextMeshProUGUI nameText;
-    [SerializeField] TextMeshProUGUI levelText;
-    [SerializeField] Image hpImgFill;
+    [FoldoutGroup("UI Component"), SerializeField] TextMeshProUGUI nameText;
+    [FoldoutGroup("UI Component"), SerializeField] TextMeshProUGUI levelText;
+    [FoldoutGroup("UI Component"), SerializeField] Image hpImgFill;
     private bool overlaySet = false;
     
 

@@ -8,6 +8,7 @@ using Unity.Netcode.Components;
 using Unity.VisualScripting;
 using UnityEngine;
 using UnityEngine.Playables;
+using Sirenix.OdinInspector;
 
 
 public enum G2_PlayerState
@@ -22,39 +23,39 @@ public enum G2_PlayerState
 }
 public class G2_PlayerController : NetworkBehaviour
 {
-    [SerializeField]
+    [FoldoutGroup("Value"),SerializeField]
     private float walkSpeed = 3.5f;
 
-    [SerializeField]
+    [FoldoutGroup("Value"), SerializeField]
     private float runSpeedOffset = 3.5f;
 
-    [SerializeField]
+    [FoldoutGroup("Value"), SerializeField]
     private float rotationSpeed = 3.5f;
 
-    [SerializeField]
+    [FoldoutGroup("Value"), SerializeField]
     private Vector2 defaultInitialPositionOnPlane = new Vector2(-4, 4);
 
-    [SerializeField]
+    [FoldoutGroup("NetworkVariable"), SerializeField]
     private NetworkVariable<Vector3> networkPositionDirection = new NetworkVariable<Vector3>();
 
-    [SerializeField]
+    [FoldoutGroup("NetworkVariable"), SerializeField]
     private NetworkVariable<Vector3> networkRotationDirection = new NetworkVariable<Vector3>();
 
-    [SerializeField]
+    [FoldoutGroup("NetworkVariable"), SerializeField]
     private NetworkVariable<G2_PlayerState> networkPlayerState = new NetworkVariable<G2_PlayerState>();
-    [SerializeField]
+    [FoldoutGroup("NetworkVariable"), SerializeField]
     private NetworkVariable<float> networkSpeed = new NetworkVariable<float>(3.5f);
-    [SerializeField]
+    [FoldoutGroup("NetworkVariable"), SerializeField]
     private NetworkVariable<float> networkPlayerHealth = new NetworkVariable<float>(1000);
-    [SerializeField]
+    [FoldoutGroup("NetworkVariable"), SerializeField]
     private NetworkVariable<float> networkMaxPlayerHealth = new NetworkVariable<float>(1000);
-    [SerializeField]
+    [FoldoutGroup("NetworkVariable"), SerializeField]
     private NetworkVariable<int> networkLevel = new NetworkVariable<int>(1);
-    [SerializeField]
+    [FoldoutGroup("NetworkVariable"), SerializeField]
     private NetworkVariable<float> networkDamage = new NetworkVariable<float>(300);
-    [SerializeField]
+    [FoldoutGroup("NetworkVariable"), SerializeField]
     private NetworkVariable<int> networkIndexCharacterModel = new NetworkVariable<int>(-1);
-    [SerializeField]
+    [FoldoutGroup("NetworkVariable"), SerializeField]
     private float oldPlayerHealth;
     private float oldMaxPlayerHealth;
     private int oldLevel;
@@ -66,7 +67,7 @@ public class G2_PlayerController : NetworkBehaviour
     private Vector3 oldInputRotation = Vector3.zero;
     [SerializeField] private G2_PlayerState oldPlayerState = G2_PlayerState.Idle;
     private float speed;
-    [SerializeField]
+    [FoldoutGroup("Animator"), SerializeField]
     private Animator animator;
 
     private bool isAttacking = false;
@@ -75,16 +76,16 @@ public class G2_PlayerController : NetworkBehaviour
     private float timeDelayCheckHit = 0.5f;
     private bool isCheckHit = true;
     private float damage = 300;
-    [SerializeField] private GameObject skillEffect;
+    [FoldoutGroup("SkillEffect"), SerializeField] private GameObject skillEffect;
 
-    [SerializeField] private ParticleSystem effectZone;
-    [SerializeField] private ParticleSystem effectAttack;
-    [SerializeField] private ParticleSystem dieEffect;
-    [SerializeField] private ParticleSystem buffHpEffect;
-    [SerializeField] private ParticleSystem levelUpEffect;
-    [SerializeField] private ParticleSystem buffDameEffect;
-    [SerializeField] private ParticleSystem buffSpeedEffect;
-    [SerializeField] private ModelSelect modelStorage;
+    [FoldoutGroup("ParticleSystem"), SerializeField] private ParticleSystem effectZone;
+    [FoldoutGroup("ParticleSystem"), SerializeField] private ParticleSystem effectAttack;
+    [FoldoutGroup("ParticleSystem"), SerializeField] private ParticleSystem dieEffect;
+    [FoldoutGroup("ParticleSystem"), SerializeField] private ParticleSystem buffHpEffect;
+    [FoldoutGroup("ParticleSystem"), SerializeField] private ParticleSystem levelUpEffect;
+    [FoldoutGroup("ParticleSystem"), SerializeField] private ParticleSystem buffDameEffect;
+    [FoldoutGroup("ParticleSystem"), SerializeField] private ParticleSystem buffSpeedEffect;
+    [FoldoutGroup("ParticleSystem"), SerializeField] private ModelSelect modelStorage;
     Coroutine coroutineAttack;
     Coroutine coroutineCheckHit;
 
@@ -159,10 +160,7 @@ public class G2_PlayerController : NetworkBehaviour
                     break;
                 default:
                     break;
-
             }
-
-
         }
     }
     private void ClientMoveAndRotate()
@@ -171,39 +169,10 @@ public class G2_PlayerController : NetworkBehaviour
         {
             transform.Rotate(networkRotationDirection.Value, Space.World);
         }
-        //if (networkPositionDirection.Value != Vector3.zero)
-        {
-            //characterController.SimpleMove(networkPositionDirection.Value);
-            //rgbody.velocity = networkPositionDirection.Value;
-        }
-
     }
 
     private void ClientVisuals()
     {
-
-        //if (oldPlayerState != networkPlayerState.Value)
-        //{
-
-        //    oldPlayerState = networkPlayerState.Value;
-        //    animator.Play(networkPlayerState.Value.ToString());
-
-        //    switch (oldPlayerState)
-        //    {
-        //        case G2_PlayerState.Die:
-        //            DOVirtual.DelayedCall(1f, () =>
-        //            {
-        //                dieEffect.gameObject.SetActive(true);
-        //                dieEffect.Play();
-        //            });
-        //            break;
-        //        default:
-        //            dieEffect.gameObject.SetActive(false);
-        //            break;
-        //    }
-
-        //}
-
         if (oldPlayerHealth != networkPlayerHealth.Value || oldMaxPlayerHealth != networkMaxPlayerHealth.Value)
         {
             if (oldPlayerHealth < networkPlayerHealth.Value)
@@ -268,7 +237,6 @@ public class G2_PlayerController : NetworkBehaviour
         {
             oldPlayerState = state;
             animator.Play(state.ToString());
-
         }
     }
     private void ClientInput()
