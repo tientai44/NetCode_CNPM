@@ -3177,6 +3177,10 @@ PrefabInstance:
       value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 19823998, guid: 18d85141fc85efc40b868ee1f24246e7, type: 3}
+      propertyPath: emitterVelocityMode
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 19823998, guid: 18d85141fc85efc40b868ee1f24246e7, type: 3}
       propertyPath: InitialModule.startLifetime.scalar
       value: 1.5
       objectReference: {fileID: 0}
@@ -3191,6 +3195,10 @@ PrefabInstance:
     - target: {fileID: 19823998, guid: 18d85141fc85efc40b868ee1f24246e7, type: 3}
       propertyPath: InitialModule.startLifetime.minScalar
       value: 0.6
+      objectReference: {fileID: 0}
+    - target: {fileID: 19836762, guid: 18d85141fc85efc40b868ee1f24246e7, type: 3}
+      propertyPath: emitterVelocityMode
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 19836762, guid: 18d85141fc85efc40b868ee1f24246e7, type: 3}
       propertyPath: InitialModule.startLifetime.scalar
@@ -3213,8 +3221,20 @@ PrefabInstance:
       value: 3
       objectReference: {fileID: 0}
     - target: {fileID: 19872990, guid: 18d85141fc85efc40b868ee1f24246e7, type: 3}
+      propertyPath: moveWithTransform
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 19872990, guid: 18d85141fc85efc40b868ee1f24246e7, type: 3}
+      propertyPath: emitterVelocityMode
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 19872990, guid: 18d85141fc85efc40b868ee1f24246e7, type: 3}
       propertyPath: InitialModule.startLifetime.scalar
       value: 2
+      objectReference: {fileID: 0}
+    - target: {fileID: 19896610, guid: 18d85141fc85efc40b868ee1f24246e7, type: 3}
+      propertyPath: emitterVelocityMode
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 19896610, guid: 18d85141fc85efc40b868ee1f24246e7, type: 3}
       propertyPath: InitialModule.startLifetime.scalar

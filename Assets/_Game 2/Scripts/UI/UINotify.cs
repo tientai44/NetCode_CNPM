@@ -10,7 +10,7 @@ public class UINotify : MonoBehaviour
     [SerializeField] Image backGround;
     [SerializeField] TextMeshProUGUI notifyText;
 
-    public void Notify(string message)
+    public void Notify(string message, float timeOut = 0)
     {
         backGround.DOKill();
         notifyText.DOKill();
@@ -24,5 +24,5 @@ public class UINotify : MonoBehaviour
         });
         notifyText.text = message;
     }
-    
+
 }
