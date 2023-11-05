@@ -53,7 +53,7 @@ public class SpawnerController : NetworkBehaviour
     }
     IEnumerator IESpawnBootster()
     {
-        yield return new WaitForSeconds(timeDuration);
+        yield return new WaitForSeconds(timeDuration*4);
         if (!GameManager.Instance.hasServerStarted)
         {
             yield break;
