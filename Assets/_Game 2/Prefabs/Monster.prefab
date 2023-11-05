@@ -313,7 +313,6 @@ MonoBehaviour:
   effectSummon: {fileID: 4110918788879939380}
   source: {fileID: 3569540650188848311}
   clipAttack: {fileID: 0}
-  Die: {fileID: 0}
 --- !u!114 &8638629812481578768
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -328,6 +327,10 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   GlobalObjectIdHash: 951099334
   AlwaysReplicateAsRoot: 0
+  SynchronizeTransform: 1
+  ActiveSceneSynchronization: 0
+  SceneMigrationSynchronization: 1
+  SpawnWithObservers: 1
   DontDestroyWithOwner: 0
   AutoObjectParentSync: 1
 --- !u!195 &8638629812481578988
@@ -390,8 +393,12 @@ MonoBehaviour:
   PositionThreshold: 0.001
   RotAngleThreshold: 0.01
   ScaleThreshold: 0.01
+  UseQuaternionSynchronization: 0
+  UseQuaternionCompression: 0
+  UseHalfFloatPrecision: 0
   InLocalSpace: 0
   Interpolate: 1
+  SlerpPosition: 0
 --- !u!82 &3569540650188848311
 AudioSource:
   m_ObjectHideFlags: 0
@@ -746,7 +753,7 @@ GameObject:
   m_PrefabAsset: {fileID: 0}
 --- !u!95 &8462288216741809022
 Animator:
-  serializedVersion: 4
+  serializedVersion: 5
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
@@ -763,7 +770,8 @@ Animator:
   m_WarningMessage: 
   m_HasTransformHierarchy: 1
   m_AllowConstantClipSamplingOptimization: 1
-  m_KeepAnimatorControllerStateOnDisable: 0
+  m_KeepAnimatorStateOnDisable: 0
+  m_WriteDefaultValuesOnDisable: 0
 --- !u!114 &4061708385038176289
 MonoBehaviour:
   m_ObjectHideFlags: 0

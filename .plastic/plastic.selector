@@ -1,0 +1,4 @@
+repository "NetCode_CNPM@c3quanganh@cloud"
+  path "/"
+    br "/main"
+    co "/main"
