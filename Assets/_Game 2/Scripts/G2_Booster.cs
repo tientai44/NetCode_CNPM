@@ -5,6 +5,7 @@ using UnityEngine;
 
 public enum G2_BoosterType
 {
+    None,
     BuffHp,
     BuffDame,
     LevelUp,
@@ -12,28 +13,31 @@ public enum G2_BoosterType
 }
 public class G2_Booster : NetworkBehaviour
 {
-    private G2_BoosterType type;
+    private G2_BoosterType type=G2_BoosterType.None;
+    private  NetworkVariable<G2_BoosterType> nw_Type = new NetworkVariable<G2_BoosterType>(G2_BoosterType.None);
+    [SerializeField] private GameObject[] models;
 
+    private void FixedUpdate()
+    {
+        if(type != nw_Type.Value)
+        {
+            if(type != G2_BoosterType.None)
+                models[(int)type-1].SetActive(false);
+            type = nw_Type.Value;
+            models[(int)type-1].SetActive(true);
+        }
+    }
     [ClientRpc]
     public void SetTypeClientRpc(G2_BoosterType _type)
     {
+        models[(int)type - 1].SetActive(false);
         type = _type;
-        switch (_type)
-        {
-            case G2_BoosterType.BuffHp:
-                GetComponentInChildren<MeshRenderer>().material.color = Color.green;
-                break;
-            case G2_BoosterType.BuffDame:
-                GetComponentInChildren<MeshRenderer>().material.color = Color.red;
-                break;
-            case G2_BoosterType.LevelUp:
-                GetComponentInChildren<MeshRenderer>().material.color = Color.yellow;
-                break;
-            case G2_BoosterType.SpeedUp:
-                GetComponentInChildren<MeshRenderer>().material.color = Color.blue;
-                break;
-        }
-        
+        models[(int)type - 1].SetActive(true);
+    }
+    
+    public void SetType(G2_BoosterType _type)
+    {
+        nw_Type.Value = _type;
     }
     private void OnTriggerEnter(Collider other)
     {

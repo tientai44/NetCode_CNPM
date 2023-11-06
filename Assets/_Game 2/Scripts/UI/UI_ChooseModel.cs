@@ -37,7 +37,7 @@ public class UI_ChooseModel : BasePopUp
     }
     private void OnDisable()
     {
-        Camera_Model.SetActive(false);
+        Camera_Model?.SetActive(false);
     }
     public void ShowModel()
     {

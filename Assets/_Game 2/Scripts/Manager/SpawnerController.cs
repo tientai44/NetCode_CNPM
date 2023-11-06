@@ -42,7 +42,7 @@ public class SpawnerController : NetworkBehaviour
         yield return new WaitForSeconds(timeDuration);
         if (!GameManager.Instance.hasServerStarted)
         {
-            yield return null;
+            yield break;
         }
         if (numMonster < 5)
         {
@@ -56,7 +56,7 @@ public class SpawnerController : NetworkBehaviour
         yield return new WaitForSeconds(timeDuration*4);
         if (!GameManager.Instance.hasServerStarted)
         {
-            yield return null;
+            yield break;
         }
         SpawnObjects();
         StartCoroutine(IESpawnBootster());
@@ -73,7 +73,8 @@ public class SpawnerController : NetworkBehaviour
 
             NetworkObject networkObject = NetworkObjectPool.Singleton.GetNetworkObject(objectPrefab, new Vector3(Random.Range(-20, 20), 10.0f, Random.Range(-20, 20)), Quaternion.identity);
             networkObject.Spawn(true);
-            networkObject.GetComponent<G2_Booster>().SetTypeClientRpc(lst[Random.Range(0, lst.Count)]);
+            //networkObject.GetComponent<G2_Booster>().SetTypeClientRpc(lst[Random.Range(0, lst.Count)]);
+            networkObject.GetComponent<G2_Booster>().SetType(lst[Random.Range(0, lst.Count)]);
 
         }
     }

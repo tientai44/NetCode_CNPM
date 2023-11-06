@@ -49,7 +49,7 @@ public class PlayersManager : NetworkBehaviour
             if (IsServer)
             {
                 LoggerDebug.Instance.LogInfo($"{id} just disconnected...");
-                playersInGame.Value-= 1;
+                playersInGame.Value= NetworkManager.Singleton.ConnectedClients.Count-1;
             }
             UIManager.Instance.UIGamePlay.SetPlayerInGame(PlayersInGame);
         };
