@@ -39,6 +39,7 @@ public class PlayerHud : NetworkBehaviour
     public void SetLevel(int level)
     {
         levelText.text = level.ToString();
+        UIManager.Instance.UIGamePlay.loggerPlayer.AddPlayerInTop(playersName.Value, level);
     }
     public void SetHP(float currentHP,float maxHP)
     {     

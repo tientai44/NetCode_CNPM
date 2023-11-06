@@ -1295,6 +1295,17 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 898240851b4ef0c4795b139922b114ad, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+--- !u!114 &1711564886 stripped
+MonoBehaviour:
+  m_CorrespondingSourceObject: {fileID: 3698944003338641093, guid: 17c33fc9f25d10c4ba890be0d640cd3b, type: 3}
+  m_PrefabInstance: {fileID: 4192869284286669076}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: c316952fb76cba641b2de5998730a464, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!114 &1811099180 stripped
 MonoBehaviour:
   m_CorrespondingSourceObject: {fileID: 5321855671265656377, guid: 17c33fc9f25d10c4ba890be0d640cd3b, type: 3}
@@ -1884,6 +1895,14 @@ PrefabInstance:
       propertyPath: m_Name
       value: UICANVAS
       objectReference: {fileID: 0}
+    - target: {fileID: 5321855670462017113, guid: 17c33fc9f25d10c4ba890be0d640cd3b, type: 3}
+      propertyPath: m_BlockingMask.m_Bits
+      value: 63
+      objectReference: {fileID: 0}
+    - target: {fileID: 5321855670813073114, guid: 17c33fc9f25d10c4ba890be0d640cd3b, type: 3}
+      propertyPath: loggerPlayer
+      value: 
+      objectReference: {fileID: 1711564886}
     - target: {fileID: 5321855671571501321, guid: 17c33fc9f25d10c4ba890be0d640cd3b, type: 3}
       propertyPath: Camera_Model
       value: 

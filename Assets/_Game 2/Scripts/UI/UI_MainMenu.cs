@@ -12,7 +12,6 @@ public class UI_MainMenu : BasePopUp
     [SerializeField] Button startClientButton;
     [SerializeField] Button selectCharacterButton;
     [SerializeField] TMP_InputField inputField;
-
     private void Awake()
     {
         startSeverButton.onClick.AddListener(OnClickStartServerBtn);

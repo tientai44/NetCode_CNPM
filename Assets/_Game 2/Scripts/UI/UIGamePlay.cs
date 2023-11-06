@@ -10,7 +10,7 @@ public class UIGamePlay : BasePopUp
     [SerializeField] TextMeshProUGUI RoomText;
     [SerializeField] TextMeshProUGUI PlayerInGameText;
     [SerializeField] Button exitRoom;
-
+    public LoggerPlayer loggerPlayer;
     void Awake()
     {
         exitRoom.onClick.AddListener(FunExitRoom);
