@@ -40,8 +40,16 @@ public class LoggerPlayer : MonoBehaviour
         topPlayerInGame.AddTop(InforPlayer, point);
         if(topPlayer.Count < 5)
         {
+            foreach(var item in topPlayer)
+            {
+                if(item.namePlayer == topPlayerInGame.namePlayer)
+                {
+                    item.AddTop(topPlayerInGame.namePlayer, topPlayerInGame.point);
+                    topPlayer = topPlayer.OrderByDescending(x => x.point).ToList();
+                    return;
+                }
+            }
             topPlayer.Add(topPlayerInGame);
-            topPlayer = topPlayer.OrderByDescending(x => x.point).ToList();
         }
         else
         {
@@ -54,6 +62,7 @@ public class LoggerPlayer : MonoBehaviour
                 }
             }
         }
+        topPlayer = topPlayer.OrderByDescending(x => x.point).ToList();
     }
 
     private void UpdateTopPlayer()
@@ -64,7 +73,7 @@ public class LoggerPlayer : MonoBehaviour
         {
             string infor = topPlayer[i].namePlayer + " " + topPlayer[i].point.ToString();
             txtText[i] = infor;
-            areaText.text += txtText[i];
+            areaText.text += "\n" + txtText[i];
         }
     }
 }
